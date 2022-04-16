@@ -1,0 +1,4 @@
+{
+	"coc.preferences.formatOnSaveFiletypes": ["tsx", "js", "ts", "css", "json"],
+	"tsserver.formatOnType": true
+}

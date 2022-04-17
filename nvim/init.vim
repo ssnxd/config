@@ -44,8 +44,9 @@ Plug 'NLKNguyen/papercolor-theme'
 
 " -----------------------------------------------------
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions = ['coc-tsserver', 'coc-json', 'coc-css', 'coc-prettier']
+let g:coc_global_extensions = ['coc-tsserver', 'coc-json', 'coc-css', 'coc-prettier', 'coc-go']
 command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
+autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
 nmap <silent> gn <Plug>(coc-diagnostic-prev)
 nmap <silent> gN <Plug>(coc-diagnostic-next)
 nmap <silent> gd <Plug>(coc-definition)
@@ -111,7 +112,7 @@ set number relativenumber
 set termguicolors
 set background=dark
 set signcolumn=number
-autocmd VimEnter * hi Normal ctermbg=NONE guibg=NONE
+"autocmd VimEnter * hi Normal ctermbg=NONE guibg=NONE
 colorscheme gruvbox
 filetype plugin on
 filetype indent on

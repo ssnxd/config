@@ -1,14 +1,4 @@
 {
   "coc.preferences.formatOnSaveFiletypes": ["tsx", "js", "ts", "css", "json"],
-  "tsserver.formatOnType": true,
-  "languageserver": {
-    "golang": {
-      "command": "gopls",
-      "rootPatterns": ["go.work", "go.mod", ".vim/", ".git/", ".hg/"],
-      "filetypes": ["go"],
-      "initializationOptions": {
-        "usePlaceholders": true
-      }
-    }
-  }
+  "tsserver.formatOnType": true
 }

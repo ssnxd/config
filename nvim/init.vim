@@ -44,9 +44,9 @@ Plug 'NLKNguyen/papercolor-theme'
 
 " -----------------------------------------------------
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions = ['coc-tsserver', 'coc-json', 'coc-css', 'coc-prettier', 'coc-go']
+let g:coc_global_extensions = ['coc-tsserver', 'coc-json', 'coc-css', 'coc-prettier', 'coc-go', 'coc-snippets']
 command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
-autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
+autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 nmap <silent> gn <Plug>(coc-diagnostic-prev)
 nmap <silent> gN <Plug>(coc-diagnostic-next)
 nmap <silent> gd <Plug>(coc-definition)

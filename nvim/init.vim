@@ -1,32 +1,32 @@
 let mapleader = " "
 set nocompatible
 
-" -----------------------------------------------------
 call plug#begin('~/.config/nvim/plugged')
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-map <C-b> :NERDTreeToggle<CR>
-let NERDTreeShowHidden=1
+
+" -----------------------------------------------------
+Plug 'kyazdani42/nvim-tree.lua'
+map <C-b> :NvimTreeToggle<CR>
+"let g:nvim_tree_show_icons = {
+    "\ 'git': 1,
+    "\ 'folders': 0,
+    "\ 'files': 0,
+    "\ 'folder_arrows': 0,
+    "\ }
 " -----------------------------------------------------
 
 " -----------------------------------------------------
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-map <C-p> :GFiles<cr>
-map <C-G> :Files<cr>
-map <C-m> :Buffers<cr>
-map <C-n> :Commands<cr>
-map <C-s> :Ag<cr>
-map <C-'> :Marks<cr>
-let g:fzf_action = {
-      \ 'return': 'tab split',
-      \ 'ctrl-j': 'split',
-      \ 'ctrl-l': 'vsplit' }
-"let g:fzf_preview_window = []
-let g:fzf_layout = { 'window': { 'width': 1, 'height': 0.4, 'relative': v:false, 'yoffset': 1.0 } }
+Plug 'ibhagwan/fzf-lua', {'branch': 'main'}
+map <C-G> :FzfLua files<cr>
+map <C-p> :FzfLua git_files<cr>
+map <leader>b :FzfLua buffers<cr>
+map <C-s> :FzfLua grep_project<cr>
 " -----------------------------------------------------
 
 " -----------------------------------------------------
 "Plug 'sbdchd/neoformat'
+Plug 'prettier/vim-prettier', { 'do': 'yarn install --frozen-lockfile --production' }
+map <Leader>f :PrettierAsync<CR>
 " -----------------------------------------------------
 
 " Themes 
@@ -36,16 +36,16 @@ let g:fzf_layout = { 'window': { 'width': 1, 'height': 0.4, 'relative': v:false,
 Plug 'gruvbox-community/gruvbox'
 let g:gruvbox_contrast_dark = 'hard'
 let g:gruvbox_transparent_bg = '1'
+" -----------------------------------------------------
 
-" Papercolor
-Plug 'NLKNguyen/papercolor-theme'
-
+"  Icons
+" -----------------------------------------------------
+Plug 'kyazdani42/nvim-web-devicons'
 " -----------------------------------------------------
 
 " -----------------------------------------------------
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions = ['coc-tsserver', 'coc-json', 'coc-css', 'coc-prettier', 'coc-go', 'coc-snippets']
-command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
+let g:coc_global_extensions = ['coc-tsserver', 'coc-json', 'coc-css', 'coc-go', 'coc-snippets']
 autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 nmap <silent> gn <Plug>(coc-diagnostic-prev)
 nmap <silent> gN <Plug>(coc-diagnostic-next)
@@ -54,7 +54,6 @@ nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 nmap <leader>rn <Plug>(coc-rename)
-map <leader>f :Prettier<cr>
 
 " trigger completion with enter
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
@@ -95,8 +94,34 @@ Plug 'tpope/vim-fugitive'
 
 call plug#end()
 
-" Lua 
 lua << EOF
+require'nvim-tree'.setup {
+  disable_netrw = true,
+  view = {
+    mappings = {
+      custom_only = false,
+      list = {
+        { key = "<C-s>", action = "split" },
+      },
+    },
+  },
+  renderer = {
+    indent_markers = {
+      enable = true,
+    },
+  },
+  actions = {
+    open_file = {
+      resize_window = true,
+      window_picker = {
+        enable = false,
+      }
+    }
+  },
+}
+
+-- local actions = require "fzf-lua.actions"
+-- require('fzf-lua').setup()
 EOF
 
 " Settings
@@ -112,10 +137,15 @@ set number relativenumber
 set termguicolors
 set background=dark
 set signcolumn=number
-"autocmd VimEnter * hi Normal ctermbg=NONE guibg=NONE
-colorscheme gruvbox
+set splitbelow
+set splitright
+autocmd vimenter * ++nested colorscheme gruvbox
 filetype plugin on
 filetype indent on
+
+if has("unix")
+  autocmd VimEnter * hi Normal ctermbg=NONE guibg=NONE
+endif
 
 " mappings
 imap jj <Esc>
@@ -131,8 +161,8 @@ nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
 " use arrow keys to resize split
-map <Up> <C-W>-
-map <Down> <C-W>+
+map <Up> <C-W>+
+map <Down> <C-W>-
 map <Left> <c-w><
 map <Right> <c-w>>
 

@@ -6,12 +6,12 @@ call plug#begin('~/.config/nvim/plugged')
 " -----------------------------------------------------
 Plug 'kyazdani42/nvim-tree.lua'
 map <C-b> :NvimTreeToggle<CR>
-"let g:nvim_tree_show_icons = {
-    "\ 'git': 1,
-    "\ 'folders': 0,
-    "\ 'files': 0,
-    "\ 'folder_arrows': 0,
-    "\ }
+let g:nvim_tree_show_icons = {
+    \ 'git': 1,
+    \ 'folders': 0,
+    \ 'files': 0,
+    \ 'folder_arrows': 0,
+    \ }
 " -----------------------------------------------------
 
 " -----------------------------------------------------
@@ -36,11 +36,6 @@ map <Leader>f :PrettierAsync<CR>
 Plug 'gruvbox-community/gruvbox'
 let g:gruvbox_contrast_dark = 'hard'
 let g:gruvbox_transparent_bg = '1'
-" -----------------------------------------------------
-
-"  Icons
-" -----------------------------------------------------
-Plug 'kyazdani42/nvim-web-devicons'
 " -----------------------------------------------------
 
 " -----------------------------------------------------

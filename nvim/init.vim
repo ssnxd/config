@@ -7,17 +7,17 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'kyazdani42/nvim-tree.lua'
 map <C-b> :NvimTreeToggle<CR>
 let g:nvim_tree_show_icons = {
-    \ 'git': 1,
-    \ 'folders': 0,
+    \ 'git': 0,
+    \ 'folders': 1,
     \ 'files': 0,
-    \ 'folder_arrows': 0,
+    \ 'folder_arrows': 1,
     \ }
 " -----------------------------------------------------
 
 " -----------------------------------------------------
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'ibhagwan/fzf-lua', {'branch': 'main'}
-map <C-G> :FzfLua files<cr>
+map <C-g> :FzfLua files<cr>
 map <C-p> :FzfLua git_files<cr>
 map <leader>b :FzfLua buffers<cr>
 map <C-s> :FzfLua grep_project<cr>
@@ -35,11 +35,12 @@ map <Leader>f :PrettierAsync<CR>
 "  Gruvbox
 Plug 'gruvbox-community/gruvbox'
 let g:gruvbox_contrast_dark = 'hard'
-let g:gruvbox_transparent_bg = '1'
 " -----------------------------------------------------
 
 " -----------------------------------------------------
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'honza/vim-snippets'
+
 let g:coc_global_extensions = ['coc-tsserver', 'coc-json', 'coc-css', 'coc-go', 'coc-snippets']
 autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 nmap <silent> gn <Plug>(coc-diagnostic-prev)
@@ -69,18 +70,20 @@ inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 " -----------------------------------------------------
 
 " -----------------------------------------------------
-Plug 'preservim/nerdcommenter'
-let g:NERDCustomDelimiters={
-	\ 'javascript': { 'left': '//', 'right': '', 'leftAlt': '{/*', 'rightAlt': '*/}' },
-\}
+Plug 'numToStr/Comment.nvim'
 " -----------------------------------------------------
 
 " -----------------------------------------------------
 Plug 'vim-airline/vim-airline'
 let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts = 1
 " -----------------------------------------------------
 
+" -----------------------------------------------------
 Plug 'sheerun/vim-polyglot'
+" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+" -----------------------------------------------------
+
 Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'pantharshit00/vim-prisma'
 Plug 'tpope/vim-surround'
@@ -115,8 +118,7 @@ require'nvim-tree'.setup {
   },
 }
 
--- local actions = require "fzf-lua.actions"
--- require('fzf-lua').setup()
+require('Comment').setup()
 EOF
 
 " Settings

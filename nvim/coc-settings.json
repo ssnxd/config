@@ -1,4 +1,10 @@
 {
+  "suggest.autoTrigger": "always",
   "coc.preferences.formatOnSaveFiletypes": ["tsx", "js", "ts", "css", "json"],
-  "tsserver.formatOnType": true
+  "tsserver.formatOnType": true,
+  "suggest.floatConfig": {
+    "border": true,
+    "rounded": true,
+    "shadow": true,
+  },
 }

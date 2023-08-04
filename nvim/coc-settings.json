@@ -1,10 +1,30 @@
 {
   "suggest.autoTrigger": "always",
-  "coc.preferences.formatOnSaveFiletypes": ["tsx", "js", "ts", "css", "json"],
-  "tsserver.formatOnType": true,
+  "suggest.enableFloat": true,
   "suggest.floatConfig": {
     "border": true,
     "rounded": true,
-    "shadow": true,
+    "winblend": 15,
+    "highlight": "GruvboxFg4",
+  },
+  "diagnostic.floatConfig": {
+    "border": true,
+    "rounded": true,
+    "winblend": 15,
+    "highlight": "GruvboxFg4",
+  },
+  "hover.floatConfig": {
+    "border": true,
+    "rounded": true,
+    "winblend": 15,
+    "highlight": "GruvboxFg4",
+  },
+  "languageserver": {
+    "golang": {
+      "command": "gopls",
+      "rootPatterns": ["go.mod"],
+      "filetypes": ["go"]
+    }
   },
 }
+

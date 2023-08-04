@@ -1,10 +1,40 @@
 {
   "workbench.iconTheme": "material-icon-theme",
-  "editor.fontFamily": "'Cascadia Code PL', 'Courier New', monospace",
+  "workbench.layoutControl.enabled": false,
+  "workbench.editor.enablePreview": false,
+
+  "editor.fontFamily": "IBM Plex Mono, monaco, monospace",
+  "terminal.integrated.macOptionIsMeta": true,
   "editor.lineNumbers": "relative",
+  "editor.lineHeight": 22.65,
+  "editor.letterSpacing": 0.5,
+  "editor.fontWeight": "300",
+  "editor.fontSize": 14,
+  "editor.cursorStyle": "line",
+  "editor.cursorWidth": 5,
+  "editor.cursorBlinking": "solid",
+  "editor.renderWhitespace": "trailing",
+  "editor.snippetSuggestions": "top",
+  "editor.glyphMargin": true,
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.semanticHighlighting.enabled": false,
+  "editor.minimap.maxColumn": 40,
+  "editor.fontLigatures": false,
+  "editor.wordBasedSuggestions": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.wordWrap": "on",
+
+  "window.zoomLevel": 1,
+  "window.menuBarVisibility": "toggle",
+
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+
   "vim.incsearch": true,
   "vim.hlsearch": true,
-  "editor.formatOnSave": true,
   "vim.insertModeKeyBindings": [
     {
       "before": ["j", "j"],
@@ -26,11 +56,19 @@
     },
     {
       "before": ["<C-l>"],
-      "commands": ["workbench.action.focusSecondEditorGroup"]
+      "commands": ["workbench.action.focusRightGroup"]
     },
     {
       "before": ["<C-h>"],
-      "commands": ["workbench.action.focusFirstEditorGroup"]
+      "commands": ["workbench.action.focusLeftGroup"]
+    },
+    {
+      "before": ["<C-j>"],
+      "commands": ["workbench.action.focusBelowGroup"]
+    },
+    {
+      "before": ["<C-k>"],
+      "commands": ["workbench.action.focusAboveGroup"]
     },
     {
       "before": ["<C-b>"],
@@ -81,22 +119,16 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.html-language-features"
   },
   "liveServer.settings.donotShowInfoMsg": true,
   "git.confirmSync": false,
-  "workbench.colorTheme": "Default Dark+ Experimental",
-  "editor.minimap.maxColumn": 30,
-  "editor.minimap.enabled": false,
   "i18n-ally.displayLanguage": "en",
-  "editor.fontLigatures": true,
-  "workbench.layoutControl.enabled": false,
   "[python]": {
     "editor.formatOnType": true
   },
   "vim.cursorStylePerMode.insert": "line-thin",
   "vim.cursorStylePerMode.normal": "block-outline",
-  "editor.wordBasedSuggestions": true,
   "[php]": {
     "editor.defaultFormatter": "DEVSENSE.phptools-vscode"
   },
@@ -106,5 +138,26 @@
   "markdown-preview-enhanced.liveUpdate": false,
   "[dockercompose]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
-  }
+  },
+  "remote.SSH.remotePlatform": {
+    "juiced.io": "linux",
+    "next.juiced.io": "linux"
+  },
+  "security.workspace.trust.untrustedFiles": "open",
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "explorer.confirmDragAndDrop": false,
+  "redhat.telemetry.enabled": false,
+  "eslint.run": "onType",
+  "workbench.sideBar.location": "right",
+  "window.commandCenter": true,
+  "editor.minimap.enabled": false,
+  "sqltools.useNodeRuntime": true,
+  "workbench.colorTheme": "Gruvbox Dark Hard",
+  "go.toolsManagement.autoUpdate": true
 }

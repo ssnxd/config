@@ -2,8 +2,9 @@ return {
 	{
 		'gruvbox-community/gruvbox',
 		priority = 1000,
+		enable = false,
 		config = function()
-			vim.cmd.colorscheme 'gruvbox'
+			-- vim.cmd.colorscheme 'gruvbox'
 			vim.g.gruvbox_contrast_dark = 'hard'
 			vim.g.gruvbox_contrast_light = 'soft'
 			vim.g.gruvbox_sign_column = 'bg0'
@@ -11,10 +12,17 @@ return {
 			vim.o.background = 'dark'
 		end,
 	},
-
+	{
+		'ishan9299/nvim-solarized-lua',
+		enable = true,
+		config = function()
+			vim.cmd.colorscheme 'solarized-flat'
+			vim.g.solarized_statusline = 'normal'
+			vim.o.background = 'light'
+		end,
+	},
 	{
 		'nvim-tree/nvim-web-devicons',
-		priority = 1000,
 		config = function()
 			require'nvim-web-devicons'.setup {
 				-- globally enable different highlight colors per icon (default to true)
@@ -32,14 +40,14 @@ return {
 		end,
 	},
 	{
-		-- Set lualine as statusline
-		'vim-airline/vim-airline',
-		config = function()
-			vim.cmd([[
-				let g:airline#extensions#tabline#enabled = 1
-				let g:airline_powerline_fonts = 1
-			]])
-		end,
+		'nvim-lualine/lualine.nvim',
+		opts = {
+			options = {
+				icons_enabled = false,
+				component_separators = '|',
+				section_separators = '',
+			},
+		},
 	},
 
 	{
@@ -48,7 +56,7 @@ return {
 		-- Enable `lukas-reineke/indent-blankline.nvim`
 		-- See `:help indent_blankline.txt`
 		opts = {
-			char = '┊',
+			show_current_context = true,
 			show_trailing_blankline_indent = false,
 		},
 	},

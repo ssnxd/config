@@ -6,7 +6,7 @@ vim.g.maplocalleader = ' '
 
 -- map("i", "jj", "<Esc>")
 keyset("n", "<Leader>s", ":w<CR>") -- save change
-keyset("n", "<Leader>e", ":q<CR>") -- exit buffer
+keyset("n", "<Leader>e", ":bd<CR>") -- exit buffer
 
 keyset("n", "<C-h>", "<C-w>h", { desc = "Go to left window", remap = true })
 keyset("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", remap = true })

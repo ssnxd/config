@@ -5,17 +5,10 @@ return {
 
 	-- Detect tabstop and shiftwidth automatically
 	'tpope/vim-sleuth',
-	{
 
-		"kylechui/nvim-surround",
-		version = "*", -- Use for stability; omit to use `main` branch for the latest features
-		event = "VeryLazy",
-		config = function()
-			require("nvim-surround").setup({
-				-- Configuration here, or leave empty to use defaults
-			})
-		end
-	},
+	'jiangmiao/auto-pairs',
+	'tpope/vim-surround',
+
 
 	{ 
 		'nvim-telescope/telescope.nvim', 
@@ -45,9 +38,9 @@ return {
 
 			vim.keymap.set('n', '<C-p>', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
 			vim.keymap.set('n', '<C-g>', require('telescope.builtin').find_files, { desc = 'Search [F]iles' })
-			vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = 'Search [B]uffer' })
-			vim.keymap.set('n', '<C-s>', require('telescope.builtin').current_buffer_fuzzy_find, { desc = 'Search current open file' })
+			vim.keymap.set('n', '<C-s>', require('telescope.builtin').live_grep, { desc = 'Search working dir' })
 			vim.keymap.set('n', '<C-b>', ':Telescope file_browser<CR>', { desc = 'Open file explorer', noremap = true })
+			vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = 'Search [B]uffer' })
 		end,
 	},
 
@@ -82,7 +75,7 @@ return {
 				-- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
 				auto_install = false,
 
-				highlight = { enable = true },
+				highlight = { enable = false },
 				indent = { enable = true },
 				incremental_selection = {
 					enable = true,
@@ -140,5 +133,15 @@ return {
 			}
 		end,
 
+	},
+	{
+		-- or
+		{
+			'akinsho/toggleterm.nvim', 
+			version = "*", 
+			opts = {
+				open_mapping = [[<c-\>]],
+			}
+		}
 	},
 }

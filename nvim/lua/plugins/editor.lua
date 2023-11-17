@@ -10,37 +10,40 @@ return {
 	'tpope/vim-surround',
 
 
-	{ 
-		'nvim-telescope/telescope.nvim', 
-		branch = '0.1.x', 
+	{
+		'nvim-telescope/telescope.nvim',
+		branch = '0.1.x',
 		dependencies = { 'nvim-lua/plenary.nvim' },
 		config = function()
+			local themes = require("telescope.themes")
+
 			require('telescope').setup {
-				defaults = {
+				defaults = vim.tbl_deep_extend("force", themes.get_dropdown(), {
+					file_ignore_patterns = { ".git", "^node_modules", "target" },
+					path_display = { "truncate" },
+					selection_caret = "  ",
 					mappings = {
 						i = {
 							['<C-u>'] = false,
 							['<C-d>'] = false,
 						},
 					},
-				},
+				}),
 
-				extensions = {
-					file_browser = {
-						hijack_netrw = true,
-					}
-				}
+				extensions = {}
 			}
 			-- Enable telescope fzf native, if installed
-			pcall(require('telescope').load_extension, 'fzf')  
-			pcall(require('telescope').load_extension, 'file_browser')  
+			pcall(require('telescope').load_extension, 'fzf')
 
 
-			vim.keymap.set('n', '<C-p>', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
+			vim.keymap.set('n', '<C-p>', require('telescope.builtin').git_files,
+				{ desc = 'Search [G]it [F]iles' })
 			vim.keymap.set('n', '<C-g>', require('telescope.builtin').find_files, { desc = 'Search [F]iles' })
-			vim.keymap.set('n', '<C-s>', require('telescope.builtin').live_grep, { desc = 'Search working dir' })
-			vim.keymap.set('n', '<C-b>', ':Telescope file_browser<CR>', { desc = 'Open file explorer', noremap = true })
-			vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = 'Search [B]uffer' })
+			vim.keymap.set('n', '<C-s>', require('telescope.builtin').live_grep,
+				{ desc = 'Search working dir' })
+			-- vim.keymap.set('n', '<C-b>', ':Telescope file_browser path=%:p:h select_buffer=true<CR>', { desc = 'Open file explorer', noremap = true })
+			vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers,
+				{ desc = 'Search [B]uffer' })
 		end,
 	},
 
@@ -56,9 +59,46 @@ return {
 			return vim.fn.executable 'cmake' == 1
 		end,
 	},
+	-- {
+	-- 	"nvim-telescope/telescope-file-browser.nvim",
+	-- 	dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+	-- },
 	{
-		"nvim-telescope/telescope-file-browser.nvim",
-		dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+		"nvim-tree/nvim-tree.lua",
+		version = "*",
+		lazy = false,
+		config = function()
+			require("nvim-tree").setup {
+				renderer = {
+					icons = {
+						show = {
+							file = false,
+							folder = false,
+							folder_arrow = true,
+							git = false,
+							modified = false,
+							diagnostics = true,
+							bookmarks = true,
+						},
+					},
+					indent_markers = {
+						enable = true,
+						inline_arrows = false,
+						icons = {
+							corner = "└",
+							edge = "│",
+							item = "│",
+							bottom = "─",
+							none = " ",
+						},
+					},
+				}
+			}
+			-- vim.keymap.set('n', '<C-b>', ':NvimTreeToggle <CR>', { desc = 'Open file explorer', noremap = true })
+			vim.keymap.set('n', '<C-b>', ':NvimTreeFindFile <CR>',
+				{ desc = 'Open file explorer with current file focus', noremap = true })
+		end,
+
 	},
 	{
 		-- Highlight, edit, and navigate code
@@ -67,10 +107,11 @@ return {
 			'nvim-treesitter/nvim-treesitter-textobjects',
 		},
 		build = ':TSUpdate',
-		config = function() 
+		config = function()
 			require('nvim-treesitter.configs').setup {
 				-- Add languages to be installed here that you want installed for treesitter
-				ensure_installed = { 'go', 'lua', 'python', 'tsx', 'typescript', 'javascript', 'json', 'yaml', 'vimdoc', 'vim' },
+				ensure_installed = { 'go', 'lua', 'python', 'tsx', 'typescript', 'javascript', 'json',
+					'yaml', 'vimdoc', 'vim' },
 
 				-- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
 				auto_install = false,
@@ -137,11 +178,11 @@ return {
 	{
 		-- or
 		{
-			'akinsho/toggleterm.nvim', 
-			version = "*", 
+			'akinsho/toggleterm.nvim',
+			version = "*",
 			opts = {
 				open_mapping = [[<c-\>]],
 			}
 		}
-	},
+	}
 }

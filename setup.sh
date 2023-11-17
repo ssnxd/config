@@ -13,13 +13,10 @@ setup_nvim() {
 	sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
-	# link the init.vim file and coc-settings 
-	ln -s "$(pwd)/nvim/init.vim" ~/.config/nvim/init.vim
-	ln -s "$(pwd)/nvim/coc-settings.json" ~/.config/nvim/coc-settings.json
+	# link the nvim folder
+	ln -s "$(pwd)/nvim" ~/.config/nvim
 
-	echo "added ~/.config/nvim/init.vim"
-	echo "added ~/.config/nvim/coc-settings.json"
-	echo "Run :PlugInstall inside nvim"
+	echo "linked ~/.config/nvim"
 
 	return 0
 }

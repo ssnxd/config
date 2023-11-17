@@ -6,6 +6,8 @@
       "rootPatterns": ["go.mod"],
       "filetypes": ["go"]
     }
-  }
+  },
+  "coc.preferences.formatOnSave": true,
+  "snippets.ultisnips.pythonPrompt": false
 }
 

@@ -1,3 +1,7 @@
+-- disable netrw for nvim-tree
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 vim.o.backup = false
 vim.o.writebackup = false
 
@@ -6,6 +10,7 @@ vim.o.hlsearch = false
 
 -- Make line numbers default
 vim.wo.relativenumber = true
+vim.wo.number = true
 
 -- Enable mouse mode
 vim.o.mouse = 'a'

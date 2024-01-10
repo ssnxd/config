@@ -8,16 +8,20 @@ return {
 	-- 	end,
 	-- },
 
-	{
-		'Shatur/neovim-ayu',
+	{ 
+		"catppuccin/nvim", 
+		name = "catppuccin", 
+		priority = 1000, 
 		config = function()
-			require('ayu').setup({
-				mirage = true, -- Set to `true` to use `mirage` variant instead of `dark` for dark background.
-				overrides = {}, -- A dictionary of group names, each associated with a dictionary of parameters (`bg`, `fg`, `sp` and `style`) and colors in hex.
-			})
-			vim.cmd.colorscheme 'ayu'
+			require 'catppuccin'.setup {
+				flavor = "mocha",
+				transparent_background = true, -- disables setting the background color.
+			}
+
+			vim.cmd.colorscheme 'catppuccin-mocha'
 		end,
 	},
+
 	{
 		'nvim-tree/nvim-web-devicons',
 		config = function()
@@ -44,7 +48,7 @@ return {
 					icons_enabled = false,
 					component_separators = '|',
 					section_separators = '',
-					theme = 'ayu',
+					theme = 'catppuccin',
 				},
 				sections = {
 					lualine_a = { 'mode' },
@@ -80,5 +84,13 @@ return {
 	-- Visual mode
 	-- "gc" to line comment
 	-- "gb" to block comment
-	{ 'numToStr/Comment.nvim', opts = {} },
+	{ 'numToStr/Comment.nvim', opts = {
+		---LHS of toggle mappings in NORMAL mode
+		-- toggler = {
+		-- 	---Line-comment toggle keymap
+		-- 	line = '',
+		-- 	---Block-comment toggle keymap
+		-- 	block = 'gbc',
+		-- },
+	} },
 }

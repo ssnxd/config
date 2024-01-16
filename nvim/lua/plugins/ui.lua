@@ -15,7 +15,7 @@ return {
 		config = function()
 			require 'catppuccin'.setup {
 				flavor = "mocha",
-				transparent_background = true, -- disables setting the background color.
+				transparent_background = false, -- disables setting the background color.
 			}
 
 			vim.cmd.colorscheme 'catppuccin-mocha'
@@ -43,6 +43,11 @@ return {
 	{
 		'nvim-lualine/lualine.nvim',
 		config = function()
+
+			local function task_name()
+				return vim.g.CURRENT_TASK_NAME
+			end
+
 			require 'lualine'.setup {
 				options = {
 					icons_enabled = false,
@@ -54,7 +59,7 @@ return {
 					lualine_a = { 'mode' },
 					lualine_b = { 'filename' },
 					lualine_c = { 'branch' },
-					lualine_x = {},
+					lualine_x = { task_name },
 					lualine_y = { 'filetype' },
 					lualine_z = { 'location' }
 				},

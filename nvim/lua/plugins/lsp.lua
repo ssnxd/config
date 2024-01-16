@@ -75,9 +75,8 @@ return {
 			-- Apply the most preferred quickfix action on the current line.
 			keyset("n", "<leader>qf", "<Plug>(coc-fix-current)", opts)
 
-			vim.cmd [[
-		  command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
-		]]
+			-- " Add `:Prettier` command to fold current buffer
+			vim.api.nvim_create_user_command("Prettier ", ":CocCommand prettier.forceFormatDocument", { nargs = 0 })
 
 			-- " Add `:Fold` command to fold current buffer
 			vim.api.nvim_create_user_command("Fold", "call CocAction('fold', <f-args>)", { nargs = '?' })

@@ -6,8 +6,15 @@ return {
 		build = "yarn install --frozen-lockfile",
 		config = function()
 			-- auto load
-			vim.g.coc_global_extensions = { 'coc-tsserver', 'coc-json', 'coc-css', 'coc-snippets',
-				'coc-prettier' }
+			vim.g.coc_global_extensions = {
+				'coc-tsserver',
+				'coc-go',
+				'coc-sumneko-lua',
+				'coc-css',
+				'coc-json',
+				'coc-snippets',
+				'coc-prettier'
+			}
 
 			local keyset = vim.keymap.set
 
@@ -76,7 +83,8 @@ return {
 			keyset("n", "<leader>qf", "<Plug>(coc-fix-current)", opts)
 
 			-- " Add `:Prettier` command to fold current buffer
-			vim.api.nvim_create_user_command("Prettier ", ":CocCommand prettier.forceFormatDocument", { nargs = 0 })
+			vim.api.nvim_create_user_command("Format", ":CocCommand prettier.forceFormatDocument",
+				{ nargs = 0 })
 
 			-- " Add `:Fold` command to fold current buffer
 			vim.api.nvim_create_user_command("Fold", "call CocAction('fold', <f-args>)", { nargs = '?' })
@@ -86,8 +94,7 @@ return {
 				"call CocActionAsync('runCommand', 'editor.action.organizeImport')", {})
 		end,
 
-	}
-
+	},
 	-- {
 	-- 	-- LSP Configuration & Plugins
 	-- 	'neovim/nvim-lspconfig',

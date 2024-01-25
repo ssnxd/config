@@ -8,14 +8,15 @@ return {
 	-- 	end,
 	-- },
 
-	{ 
-		"catppuccin/nvim", 
-		name = "catppuccin", 
-		priority = 1000, 
+	{
+		"catppuccin/nvim",
+		name = "catppuccin",
+		priority = 1000,
 		config = function()
 			require 'catppuccin'.setup {
 				flavor = "mocha",
 				transparent_background = false, -- disables setting the background color.
+				show_end_of_buffer = true,
 			}
 
 			vim.cmd.colorscheme 'catppuccin-mocha'
@@ -41,9 +42,18 @@ return {
 		end,
 	},
 	{
+		'akinsho/bufferline.nvim',
+		version = "*",
+		dependencies = 'nvim-tree/nvim-web-devicons',
+		config = function()
+			require("bufferline").setup {
+				highlights = require("catppuccin.groups.integrations.bufferline").get()
+			}
+		end,
+	},
+	{
 		'nvim-lualine/lualine.nvim',
 		config = function()
-
 			local function task_name()
 				return vim.g.CURRENT_TASK_NAME
 			end
@@ -53,7 +63,7 @@ return {
 					icons_enabled = false,
 					component_separators = '|',
 					section_separators = '',
-					theme = 'catppuccin',
+					theme = 'catppuccin-mocha',
 				},
 				sections = {
 					lualine_a = { 'mode' },
@@ -89,13 +99,16 @@ return {
 	-- Visual mode
 	-- "gc" to line comment
 	-- "gb" to block comment
-	{ 'numToStr/Comment.nvim', opts = {
-		---LHS of toggle mappings in NORMAL mode
-		-- toggler = {
-		-- 	---Line-comment toggle keymap
-		-- 	line = '',
-		-- 	---Block-comment toggle keymap
-		-- 	block = 'gbc',
-		-- },
-	} },
+	{
+		'numToStr/Comment.nvim',
+		opts = {
+			---LHS of toggle mappings in NORMAL mode
+			-- toggler = {
+			-- 	---Line-comment toggle keymap
+			-- 	line = '',
+			-- 	---Block-comment toggle keymap
+			-- 	block = 'gbc',
+			-- },
+		}
+	},
 }

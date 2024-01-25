@@ -176,13 +176,17 @@ return {
 
 	},
 	{
-		-- or
-		{
-			'akinsho/toggleterm.nvim',
-			version = "*",
-			opts = {
-				open_mapping = [[<c-\>]],
-			}
+		'akinsho/toggleterm.nvim',
+		version = "*",
+		opts = {
+			open_mapping = [[<c-\>]],
 		}
+	},
+	{
+		'lewis6991/gitsigns.nvim',
+		version = "*",
+		config = function()
+			require('gitsigns').setup()
+		end
 	}
 }

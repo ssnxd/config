@@ -41,6 +41,8 @@ return {
 			vim.keymap.set('n', '<C-g>', require('telescope.builtin').find_files, { desc = 'Search [F]iles' })
 			vim.keymap.set('n', '<C-s>', require('telescope.builtin').live_grep,
 				{ desc = 'Search working dir' })
+			vim.keymap.set('n', '<C-r>', require('telescope.builtin').resume,
+				{ desc = 'Resume search' })
 			-- vim.keymap.set('n', '<C-b>', ':Telescope file_browser path=%:p:h select_buffer=true<CR>', { desc = 'Open file explorer', noremap = true })
 			vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers,
 				{ desc = 'Search [B]uffer' })

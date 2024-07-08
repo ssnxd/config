@@ -46,6 +46,10 @@ return {
 			-- vim.keymap.set('n', '<C-b>', ':Telescope file_browser path=%:p:h select_buffer=true<CR>', { desc = 'Open file explorer', noremap = true })
 			vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers,
 				{ desc = 'Search [B]uffer' })
+
+
+			-- vim.keymap.set('n', '<C-b>', ':NvimTreeFindFileToggle <CR>',
+			-- 	{ desc = 'Open file explorer with current file focus', noremap = true })
 		end,
 	},
 
@@ -65,43 +69,6 @@ return {
 	-- 	"nvim-telescope/telescope-file-browser.nvim",
 	-- 	dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
 	-- },
-	{
-		"nvim-tree/nvim-tree.lua",
-		version = "*",
-		lazy = false,
-		config = function()
-			require("nvim-tree").setup {
-				renderer = {
-					icons = {
-						show = {
-							file = false,
-							folder = false,
-							folder_arrow = true,
-							git = false,
-							modified = false,
-							diagnostics = true,
-							bookmarks = true,
-						},
-					},
-					indent_markers = {
-						enable = true,
-						inline_arrows = false,
-						icons = {
-							corner = "└",
-							edge = "│",
-							item = "│",
-							bottom = "─",
-							none = " ",
-						},
-					},
-				}
-			}
-			-- vim.keymap.set('n', '<C-b>', ':NvimTreeToggle <CR>', { desc = 'Open file explorer', noremap = true })
-			vim.keymap.set('n', '<C-b>', ':NvimTreeFindFile <CR>',
-				{ desc = 'Open file explorer with current file focus', noremap = true })
-		end,
-
-	},
 	{
 		-- Highlight, edit, and navigate code
 		'nvim-treesitter/nvim-treesitter',

@@ -1,6 +1,6 @@
 -- disable netrw for nvim-tree
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+-- vim.g.loaded_netrw = 1
+-- vim.g.loaded_netrwPlugin = 1
 
 vim.o.backup = false
 vim.o.writebackup = false
@@ -40,3 +40,5 @@ vim.o.completeopt = 'menuone,noselect'
 
 vim.o.termguicolors = true
 vim.o.cursorline = true
+
+vim.g.have_nerd_font = true

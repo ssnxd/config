@@ -1,0 +1,32 @@
+{
+    "workspace.library": [
+        "/Users/surajnegi/.local/share/nvim/lazy/neodev.nvim/types/stable",
+        "/opt/homebrew/Cellar/neovim/0.9.5/share/nvim/runtime/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/cmp-nvim-lsp/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/neodev.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/lazy.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/cmp-path/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/nvim-lspconfig/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/conform.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/tokyonight.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/mason.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/nvim-treesitter/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/nvim-cmp/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/todo-comments.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/mini.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/plenary.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/cmp_luasnip/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/LuaSnip/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/gitsigns.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/telescope-fzf-native.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/mason-tool-installer.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/telescope.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/which-key.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/Comment.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/telescope-ui-select.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/mason-lspconfig.nvim/lua",
+        "/Users/surajnegi/.local/share/nvim/lazy/fidget.nvim/lua",
+        "/Users/surajnegi/code/config/nvim/lua",
+        "${3rd}/luv/library"
+    ]
+}

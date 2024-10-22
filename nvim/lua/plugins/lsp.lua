@@ -32,6 +32,18 @@ return {
       local cmp = require('cmp')
       local cmp_action = lsp_zero.cmp_action()
 
+
+      lsp_zero.format_on_save({
+  format_opts = {
+    async = false,
+    timeout_ms = 10000,
+  },
+  servers = {
+    ['biome'] = {'javascript', 'typescript', 'javascriptreact', 'json', 'typescriptreact'},
+    ['rust_analyzer'] = {'rust'},
+  }
+})
+
       cmp.setup({
         formatting = lsp_zero.cmp_format({ details = true }),
         mapping = cmp.mapping.preset.insert({

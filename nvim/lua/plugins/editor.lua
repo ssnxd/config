@@ -5,9 +5,25 @@ return {
 
 	-- Detect tabstop and shiftwidth automatically
 	'tpope/vim-sleuth',
-
-	'jiangmiao/auto-pairs',
 	'tpope/vim-surround',
+
+	{
+		'windwp/nvim-autopairs',
+		event = "InsertEnter",
+		config = true
+	},
+
+	{
+		'windwp/nvim-ts-autotag',
+		event = "BufReadPre",
+		config = true,
+		opts = {
+			-- Defaults
+			enable_close = true, -- Auto close tags
+			enable_rename = true, -- Auto rename pairs of tags
+			enable_close_on_slash = false -- Auto close on trailing </
+		},
+	},
 
 
 	{
@@ -60,10 +76,7 @@ return {
 		'nvim-telescope/telescope-fzf-native.nvim',
 		-- NOTE: If you are having trouble with this installation,
 		--       refer to the README for telescope-fzf-native for more instructions.
-		build = 'cmake',
-		cond = function()
-			return vim.fn.executable 'cmake' == 1
-		end,
+		build = 'make',
 	},
 	-- {
 	-- 	"nvim-telescope/telescope-file-browser.nvim",

@@ -1,100 +1,100 @@
 return {
-  {
-    'VonHeikemen/lsp-zero.nvim',
-    branch = 'v3.x',
-    lazy = true,
-    config = false,
-    init = function()
-      -- Disable automatic setup, we are doing it manually
-      vim.g.lsp_zero_extend_cmp = 0
-      vim.g.lsp_zero_extend_lspconfig = 0
-    end,
-  },
-  {
-    'williamboman/mason.nvim',
-    lazy = false,
-    config = true,
-  },
+	{
+		"neovim/nvim-lspconfig",
+		dependencies = {
+			{ "williamboman/mason.nvim" },
+			{ "williamboman/mason-lspconfig.nvim" },
+			{ "hrsh7th/nvim-cmp" },
+			{ "hrsh7th/cmp-nvim-lsp" },
+			{ "L3MON4D3/LuaSnip" },
+			{ "stevearc/conform.nvim" },
+			{ "onsails/lspkind.nvim" },
+		},
+		config = function()
+			-- note: diagnostics are not exclusive to lsp servers
+			-- so these can be global keybindings
+			vim.keymap.set("n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>")
+			vim.keymap.set("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>")
+			vim.keymap.set("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>")
 
-  -- Autocompletion
-  {
-    'hrsh7th/nvim-cmp',
-    event = 'InsertEnter',
-    dependencies = {
-      { 'L3MON4D3/LuaSnip' },
-    },
-    config = function()
-      -- Here is where you configure the autocompletion settings.
-      local lsp_zero = require('lsp-zero')
-      lsp_zero.extend_cmp()
+			vim.api.nvim_create_autocmd("LspAttach", {
+				desc = "LSP actions",
+				callback = function(event)
+					local opts = { buffer = event.buf }
 
-      -- And you can configure cmp even more, if you want to.
-      local cmp = require('cmp')
-      local cmp_action = lsp_zero.cmp_action()
+					-- these will be buffer-local keybindings
+					-- because they only work if you have an active language server
 
+					vim.keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<cr>", opts)
+					vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
+					vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
+					vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
+					vim.keymap.set("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
+					vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", opts)
+					vim.keymap.set("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
 
-      lsp_zero.format_on_save({
-  format_opts = {
-    async = false,
-    timeout_ms = 10000,
-  },
-  servers = {
-    ['biome'] = {'javascript', 'typescript', 'javascriptreact', 'json', 'typescriptreact'},
-    ['rust_analyzer'] = {'rust'},
-  }
-})
+					-- Code actions
+					vim.keymap.set("n", "<F2>", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
 
-      cmp.setup({
-        formatting = lsp_zero.cmp_format({ details = true }),
-        mapping = cmp.mapping.preset.insert({
-          ['<C-Space>'] = cmp.mapping.complete(),
-          ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-          ['<C-d>'] = cmp.mapping.scroll_docs(4),
-          ['<C-f>'] = cmp_action.luasnip_jump_forward(),
-          ['<C-b>'] = cmp_action.luasnip_jump_backward(),
-          ['<CR>'] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-        }),
-        snippet = {
-          expand = function(args)
-            require('luasnip').lsp_expand(args.body)
-          end,
-        },
-      })
-    end
-  },
+					-- Rename
+					vim.keymap.set("n", "<F3>", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
+				end,
+			})
 
-  -- LSP
-  {
-    'neovim/nvim-lspconfig',
-    cmd = { 'LspInfo', 'LspInstall', 'LspStart' },
-    event = { 'BufReadPre', 'BufNewFile' },
-    dependencies = {
-      { 'hrsh7th/cmp-nvim-lsp' },
-      { 'williamboman/mason-lspconfig.nvim' },
-    },
-    config = function()
-      -- This is where all the LSP shenanigans will live
-      local lsp_zero = require('lsp-zero')
-      lsp_zero.extend_lspconfig()
+			local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-      --- if you want to know more about lsp-zero and mason.nvim
-      --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
-      lsp_zero.on_attach(function(client, bufnr)
-        -- see :help lsp-zero-keybindings
-        -- to learn the available actions
-        lsp_zero.default_keymaps({ buffer = bufnr })
-      end)
+			local default_setup = function(server)
+				require("lspconfig")[server].setup({
+					capabilities = lsp_capabilities,
+				})
+			end
 
-      require('mason-lspconfig').setup({
-        ensure_installed = {},
-        handlers = {
-          -- this first function is the "default handler"
-          -- it applies to every language server without a "custom handler"
-          function(server_name)
-            require('lspconfig')[server_name].setup({})
-          end,
-        }
-      })
-    end
-  }
+			require("mason").setup({})
+			require("mason-lspconfig").setup({
+				ensure_installed = {},
+				handlers = {
+					default_setup,
+				},
+			})
+
+			local cmp = require("cmp")
+
+			cmp.setup({
+				sources = {
+					{ name = "nvim_lsp" },
+				},
+				mapping = cmp.mapping.preset.insert({
+					-- Enter key confirms completion item
+					["<CR>"] = cmp.mapping.confirm({ select = false }),
+
+					-- Ctrl + space triggers completion menu
+					["<C-Space>"] = cmp.mapping.complete(),
+				}),
+				snippet = {
+					expand = function(args)
+						require("luasnip").lsp_expand(args.body)
+					end,
+				},
+			})
+
+			-- Formaters
+			require("conform").setup({
+				formatters_by_ft = {
+					lua = { "stylua" },
+					javascript = { "biome-check" },
+					javascriptreact = { "biome-check" },
+					typescript = { "biome-check" },
+					typescriptreact = { "biome-check" },
+					json = { "biome-check" },
+				},
+				format_on_save = {
+					-- These options will be passed to conform.format()
+					timeout_ms = 500,
+					lsp_format = "fallback",
+				},
+			})
+
+			require("lspkind").init()
+		end,
+	},
 }

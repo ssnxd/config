@@ -1,71 +1,61 @@
 return {
 	-- Git related plugins
-	'tpope/vim-fugitive',
-	'tpope/vim-rhubarb',
+	"tpope/vim-fugitive",
+	"tpope/vim-rhubarb",
 
 	-- Detect tabstop and shiftwidth automatically
-	'tpope/vim-sleuth',
-	'tpope/vim-surround',
+	"tpope/vim-sleuth",
+	"tpope/vim-surround",
 
 	{
-		'windwp/nvim-autopairs',
+		"windwp/nvim-autopairs",
 		event = "InsertEnter",
-		config = true
+		config = true,
 	},
 
 	{
-		'windwp/nvim-ts-autotag',
+		"windwp/nvim-ts-autotag",
 		event = "BufReadPre",
 		config = true,
-		opts = {
-			-- Defaults
-			enable_close = true, -- Auto close tags
-			enable_rename = true, -- Auto rename pairs of tags
-			enable_close_on_slash = false -- Auto close on trailing </
-		},
+		opts = {},
 	},
 
-
 	{
-		'nvim-telescope/telescope.nvim',
-		branch = '0.1.x',
-		dependencies = { 'nvim-lua/plenary.nvim' },
+		"nvim-telescope/telescope.nvim",
+		branch = "0.1.x",
+		dependencies = { "nvim-lua/plenary.nvim" },
 		config = function()
 			local themes = require("telescope.themes")
 
-			require('telescope').setup {
+			require("telescope").setup({
 				defaults = vim.tbl_deep_extend("force", themes.get_dropdown(), {
 					file_ignore_patterns = { ".git", "^node_modules", "target" },
 					path_display = { "truncate" },
 					selection_caret = "  ",
 					mappings = {
 						i = {
-							['<C-u>'] = false,
-							['<C-d>'] = false,
+							["<C-u>"] = false,
+							["<C-d>"] = false,
 						},
 					},
 				}),
 
-				extensions = {}
-			}
+				extensions = {},
+			})
 			-- Enable telescope fzf native, if installed
-			pcall(require('telescope').load_extension, 'fzf')
+			pcall(require("telescope").load_extension, "fzf")
 
+			local builtin = require("telescope.builtin")
 
-			vim.keymap.set('n', '<C-p>', require('telescope.builtin').git_files,
-				{ desc = 'Search [G]it [F]iles' })
-			vim.keymap.set('n', '<C-g>', require('telescope.builtin').find_files, { desc = 'Search [F]iles' })
-			vim.keymap.set('n', '<C-s>', require('telescope.builtin').live_grep,
-				{ desc = 'Search working dir' })
-			vim.keymap.set('n', '<C-r>', require('telescope.builtin').resume,
-				{ desc = 'Resume search' })
-			-- vim.keymap.set('n', '<C-b>', ':Telescope file_browser path=%:p:h select_buffer=true<CR>', { desc = 'Open file explorer', noremap = true })
-			vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers,
-				{ desc = 'Search [B]uffer' })
+			local function neoclip()
+				vim.cmd([[:Telescope neoclip]])
+			end
 
-
-			-- vim.keymap.set('n', '<C-b>', ':NvimTreeFindFileToggle <CR>',
-			-- 	{ desc = 'Open file explorer with current file focus', noremap = true })
+			vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "Search [G]it [F]iles" })
+			vim.keymap.set("n", "<C-g>", builtin.find_files, { desc = "Search [F]iles" })
+			vim.keymap.set("n", "<C-s>", builtin.live_grep, { desc = "Search working dir" })
+			vim.keymap.set("n", "<C-r>", builtin.resume, { desc = "Resume search" })
+			vim.keymap.set("n", "<leader>cb", neoclip, { desc = "Search clipboard" })
 		end,
 	},
 
@@ -73,27 +63,42 @@ return {
 	-- Only load if `make` is available. Make sure you have the system
 	-- requirements installed.
 	{
-		'nvim-telescope/telescope-fzf-native.nvim',
+		"nvim-telescope/telescope-fzf-native.nvim",
 		-- NOTE: If you are having trouble with this installation,
 		--       refer to the README for telescope-fzf-native for more instructions.
-		build = 'make',
+		build = "make",
 	},
-	-- {
-	-- 	"nvim-telescope/telescope-file-browser.nvim",
-	-- 	dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
-	-- },
+	{
+		"AckslD/nvim-neoclip.lua",
+		dependencies = {
+			{ "nvim-telescope/telescope.nvim" },
+		},
+		config = function()
+			require("neoclip").setup()
+		end,
+	},
 	{
 		-- Highlight, edit, and navigate code
-		'nvim-treesitter/nvim-treesitter',
+		"nvim-treesitter/nvim-treesitter",
 		dependencies = {
-			'nvim-treesitter/nvim-treesitter-textobjects',
+			"nvim-treesitter/nvim-treesitter-textobjects",
 		},
-		build = ':TSUpdate',
+		build = ":TSUpdate",
 		config = function()
-			require('nvim-treesitter.configs').setup {
+			require("nvim-treesitter.configs").setup({
 				-- Add languages to be installed here that you want installed for treesitter
-				ensure_installed = { 'go', 'lua', 'python', 'tsx', 'typescript', 'javascript', 'json',
-					'yaml', 'vimdoc', 'vim' },
+				ensure_installed = {
+					"go",
+					"lua",
+					"python",
+					"tsx",
+					"typescript",
+					"javascript",
+					"json",
+					"yaml",
+					"vimdoc",
+					"vim",
+				},
 
 				-- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
 				auto_install = false,
@@ -103,10 +108,10 @@ return {
 				incremental_selection = {
 					enable = true,
 					keymaps = {
-						init_selection = '<c-space>',
-						node_incremental = '<c-space>',
-						scope_incremental = '<c-s>',
-						node_decremental = '<M-space>',
+						init_selection = "<c-space>",
+						node_incremental = "<c-space>",
+						scope_incremental = "<c-s>",
+						node_decremental = "<M-space>",
 					},
 				},
 				textobjects = {
@@ -115,60 +120,73 @@ return {
 						lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
 						keymaps = {
 							-- You can use the capture groups defined in textobjects.scm
-							['aa'] = '@parameter.outer',
-							['ia'] = '@parameter.inner',
-							['af'] = '@function.outer',
-							['if'] = '@function.inner',
-							['ac'] = '@class.outer',
-							['ic'] = '@class.inner',
+							["aa"] = "@parameter.outer",
+							["ia"] = "@parameter.inner",
+							["af"] = "@function.outer",
+							["if"] = "@function.inner",
+							["ac"] = "@class.outer",
+							["ic"] = "@class.inner",
 						},
 					},
 					move = {
 						enable = true,
 						set_jumps = true, -- whether to set jumps in the jumplist
 						goto_next_start = {
-							[']m'] = '@function.outer',
-							[']]'] = '@class.outer',
+							["]m"] = "@function.outer",
+							["]]"] = "@class.outer",
 						},
 						goto_next_end = {
-							[']M'] = '@function.outer',
-							[']['] = '@class.outer',
+							["]M"] = "@function.outer",
+							["]["] = "@class.outer",
 						},
 						goto_previous_start = {
-							['[m'] = '@function.outer',
-							['[['] = '@class.outer',
+							["[m"] = "@function.outer",
+							["[["] = "@class.outer",
 						},
 						goto_previous_end = {
-							['[M'] = '@function.outer',
-							['[]'] = '@class.outer',
+							["[M"] = "@function.outer",
+							["[]"] = "@class.outer",
 						},
 					},
 					swap = {
 						enable = true,
 						swap_next = {
-							['<leader>a'] = '@parameter.inner',
+							["<leader>a"] = "@parameter.inner",
 						},
 						swap_previous = {
-							['<leader>A'] = '@parameter.inner',
+							["<leader>A"] = "@parameter.inner",
 						},
 					},
 				},
-			}
+			})
 		end,
-
 	},
 	{
-		'akinsho/toggleterm.nvim',
+		"akinsho/toggleterm.nvim",
 		version = "*",
 		opts = {
 			open_mapping = [[<c-\>]],
-		}
+		},
 	},
 	{
-		'lewis6991/gitsigns.nvim',
+		"lewis6991/gitsigns.nvim",
 		version = "*",
 		config = function()
-			require('gitsigns').setup()
-		end
-	}
+			require("gitsigns").setup()
+		end,
+	},
+	{
+		"folke/which-key.nvim",
+		event = "VeryLazy",
+		opts = {},
+		keys = {
+			{
+				"<leader>?",
+				function()
+					require("which-key").show({ global = false })
+				end,
+				desc = "Buffer Local Keymaps (which-key)",
+			},
+		},
+	},
 }

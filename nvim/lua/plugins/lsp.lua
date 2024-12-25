@@ -1,16 +1,57 @@
+local servers = {
+	"lua_ls",
+	"ts_ls",
+	"gopls",
+	"biome",
+	"html",
+	"cssls",
+	"tailwindcss",
+	"jsonls",
+}
+
 return {
+	{
+		"saghen/blink.cmp",
+		dependencies = "rafamadriz/friendly-snippets",
+		version = "*",
+		opts = {
+			keymap = { preset = "enter" },
+			appearance = {
+				nerd_font_variant = "mono",
+			},
+			sources = {
+				default = { "lsp", "path", "snippets", "buffer" },
+			},
+			signature = { enabled = true },
+			completion = {
+				list = {
+					selection = "auto_insert",
+				},
+			},
+		},
+		opts_extend = { "sources.default" },
+	},
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
-			{ "williamboman/mason.nvim" },
-			{ "williamboman/mason-lspconfig.nvim" },
-			{ "hrsh7th/nvim-cmp" },
-			{ "hrsh7th/cmp-nvim-lsp" },
-			{ "L3MON4D3/LuaSnip" },
-			{ "stevearc/conform.nvim" },
-			{ "onsails/lspkind.nvim" },
+			"williamboman/mason.nvim",
+			"williamboman/mason-lspconfig.nvim",
+			"saghen/blink.cmp",
 		},
 		config = function()
+			require("mason").setup()
+			require("mason-lspconfig").setup({
+				ensure_installed = servers,
+			})
+
+			require("mason-lspconfig").setup_handlers({
+				function(server_name)
+					require("lspconfig")[server_name].setup({
+						capabilities = require("blink.cmp").get_lsp_capabilities({}),
+					})
+				end,
+			})
+
 			-- note: diagnostics are not exclusive to lsp servers
 			-- so these can be global keybindings
 			vim.keymap.set("n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>")
@@ -40,44 +81,11 @@ return {
 					vim.keymap.set("n", "<F3>", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
 				end,
 			})
-
-			local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-			local default_setup = function(server)
-				require("lspconfig")[server].setup({
-					capabilities = lsp_capabilities,
-				})
-			end
-
-			require("mason").setup({})
-			require("mason-lspconfig").setup({
-				ensure_installed = {},
-				handlers = {
-					default_setup,
-				},
-			})
-
-			local cmp = require("cmp")
-
-			cmp.setup({
-				sources = {
-					{ name = "nvim_lsp" },
-				},
-				mapping = cmp.mapping.preset.insert({
-					-- Enter key confirms completion item
-					["<CR>"] = cmp.mapping.confirm({ select = false }),
-
-					-- Ctrl + space triggers completion menu
-					["<C-Space>"] = cmp.mapping.complete(),
-				}),
-				snippet = {
-					expand = function(args)
-						require("luasnip").lsp_expand(args.body)
-					end,
-				},
-			})
-
-			-- Formaters
+		end,
+	},
+	{
+		"stevearc/conform.nvim",
+		config = function()
 			require("conform").setup({
 				formatters_by_ft = {
 					lua = { "stylua" },
@@ -93,8 +101,6 @@ return {
 					lsp_format = "fallback",
 				},
 			})
-
-			require("lspkind").init()
 		end,
 	},
 }

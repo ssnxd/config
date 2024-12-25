@@ -1,0 +1,30 @@
+window:
+  padding:
+    x: 0
+    y: 5
+  decorations: buttonless
+  opacity: .8
+  # Values for `startup_mode`:
+  #   - Windowed
+  #   - Maximized
+  #   - Fullscreen
+  startup_mode: Windowed
+
+font:
+  # Normal (roman) font face
+  normal:
+    # family: JetBrains Mono
+    # family: JetBrainsMono Nerd Font
+    family: MonaspiceAr Nerd Font
+  size: 16.0
+
+  bold:
+    family: MonaspiceNe Nerd Font
+    # The `style` can be specified to pick a specific face.
+    style: Bold
+
+  # Italic font face
+  italic:
+    family: MonaspiceRn Nerd Font
+    # The `style` can be specified to pick a specific face.
+    style: Italic

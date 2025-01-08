@@ -1,3 +1,14 @@
+local ensure_installed = {
+	"lua_ls",
+	"ts_ls",
+	"gopls",
+	"biome",
+	"html",
+	"cssls",
+	"tailwindcss",
+	"jsonls",
+}
+
 return {
 	{
 		"neovim/nvim-lspconfig",
@@ -51,7 +62,8 @@ return {
 
 			require("mason").setup({})
 			require("mason-lspconfig").setup({
-				ensure_installed = {},
+				ensure_installed = ensure_installed,
+				automatic_installation = true,
 				handlers = {
 					default_setup,
 				},

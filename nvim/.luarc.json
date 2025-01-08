@@ -28,5 +28,8 @@
         "/Users/surajnegi/.local/share/nvim/lazy/fidget.nvim/lua",
         "/Users/surajnegi/code/config/nvim/lua",
         "${3rd}/luv/library"
+    ],
+    "diagnostics.globals": [
+        "vim"
     ]
 }

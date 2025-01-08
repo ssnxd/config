@@ -1,21 +1,11 @@
 return {
 
 	{
-		"EdenEast/nightfox.nvim",
-
+		"dracula/vim",
+		lazy = false,
+		priority = 1000,
 		config = function()
-			require("nightfox").setup({
-				options = {
-					transparent = false,
-					dim_inactive = true,
-					styles = {
-						comments = "italic",
-						functions = "bold",
-					},
-				},
-			})
-
-			vim.cmd("colorscheme nightfox")
+			vim.cmd.colorscheme("dracula")
 		end,
 	},
 

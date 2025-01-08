@@ -1,163 +1,163 @@
 {
-  "workbench.iconTheme": "material-icon-theme",
-  "workbench.layoutControl.enabled": false,
-  "workbench.editor.enablePreview": false,
+	"workbench.iconTheme": "material-icon-theme",
+	"workbench.layoutControl.enabled": false,
+	"workbench.editor.enablePreview": false,
 
-  "editor.fontFamily": "IBM Plex Mono, monaco, monospace",
-  "terminal.integrated.macOptionIsMeta": true,
-  "editor.lineNumbers": "relative",
-  "editor.lineHeight": 22.65,
-  "editor.letterSpacing": 0.5,
-  "editor.fontWeight": "300",
-  "editor.fontSize": 14,
-  "editor.cursorStyle": "line",
-  "editor.cursorWidth": 5,
-  "editor.cursorBlinking": "solid",
-  "editor.renderWhitespace": "trailing",
-  "editor.snippetSuggestions": "top",
-  "editor.glyphMargin": true,
-  "editor.acceptSuggestionOnEnter": "on",
-  "editor.semanticHighlighting.enabled": false,
-  "editor.minimap.maxColumn": 40,
-  "editor.fontLigatures": false,
-  "editor.wordBasedSuggestions": true,
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  "editor.wordWrap": "on",
+	"editor.fontFamily": "IBM Plex Mono, monaco, monospace",
+	"terminal.integrated.macOptionIsMeta": true,
+	"editor.lineNumbers": "relative",
+	"editor.lineHeight": 22.65,
+	"editor.letterSpacing": 0.5,
+	"editor.fontWeight": "300",
+	"editor.fontSize": 14,
+	"editor.cursorStyle": "line",
+	"editor.cursorWidth": 5,
+	"editor.cursorBlinking": "solid",
+	"editor.renderWhitespace": "trailing",
+	"editor.snippetSuggestions": "top",
+	"editor.glyphMargin": true,
+	"editor.acceptSuggestionOnEnter": "on",
+	"editor.semanticHighlighting.enabled": false,
+	"editor.minimap.maxColumn": 40,
+	"editor.fontLigatures": false,
+	"editor.wordBasedSuggestions": true,
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	},
+	"editor.wordWrap": "on",
 
-  "window.zoomLevel": 1,
-  "window.menuBarVisibility": "toggle",
+	"window.zoomLevel": 1,
+	"window.menuBarVisibility": "toggle",
 
-  "files.trimFinalNewlines": true,
-  "files.trimTrailingWhitespace": true,
+	"files.trimFinalNewlines": true,
+	"files.trimTrailingWhitespace": true,
 
-  "vim.incsearch": true,
-  "vim.hlsearch": true,
-  "vim.insertModeKeyBindings": [
-    {
-      "before": ["j", "j"],
-      "after": ["<Esc>"]
-    }
-  ],
-  "vim.normalModeKeyBindingsNonRecursive": [
-    {
-      "before": ["<leader>", "s"],
-      "commands": ["workbench.action.files.save"]
-    },
-    {
-      "before": ["<leader>", "e"],
-      "commands": [":q"]
-    },
-    {
-      "before": ["<leader>", "f"],
-      "commands": ["workbench"]
-    },
-    {
-      "before": ["<C-l>"],
-      "commands": ["workbench.action.focusRightGroup"]
-    },
-    {
-      "before": ["<C-h>"],
-      "commands": ["workbench.action.focusLeftGroup"]
-    },
-    {
-      "before": ["<C-j>"],
-      "commands": ["workbench.action.focusBelowGroup"]
-    },
-    {
-      "before": ["<C-k>"],
-      "commands": ["workbench.action.focusAboveGroup"]
-    },
-    {
-      "before": ["<C-b>"],
-      "commands": ["workbench.action.toggleSidebarVisibility"]
-    },
-    {
-      "before": ["g", "d"],
-      "commands": ["editor.action.peekDefinition"]
-    },
-    {
-      "before": ["g", "r"],
-      "commands": ["editor.action.goToReferences"]
-    },
-    {
-      "before": ["<leader>", "a", "c"],
-      "commands": ["editor.action.codeAction"]
-    },
-    {
-      "before": ["<leader>", "c", "c"],
-      "commands": ["editor.action.commentLine"]
-    },
-    {
-      "before": ["<leader>", "f"],
-      "commands": ["editor.action.formatDocument"]
-    }
-  ],
-  "vim.visualModeKeyBindings": [
-    {
-      "before": ["<leader>", "c", "c"],
-      "commands": ["editor.action.commentTrigger"]
-    }
-  ],
-  "vim.leader": "<space>",
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[html]": {
-    "editor.defaultFormatter": "vscode.html-language-features"
-  },
-  "liveServer.settings.donotShowInfoMsg": true,
-  "git.confirmSync": false,
-  "i18n-ally.displayLanguage": "en",
-  "[python]": {
-    "editor.formatOnType": true
-  },
-  "vim.cursorStylePerMode.insert": "line-thin",
-  "vim.cursorStylePerMode.normal": "block-outline",
-  "[php]": {
-    "editor.defaultFormatter": "DEVSENSE.phptools-vscode"
-  },
-  "[css]": {
-    "editor.defaultFormatter": "vscode.css-language-features"
-  },
-  "markdown-preview-enhanced.liveUpdate": false,
-  "[dockercompose]": {
-    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
-  },
-  "remote.SSH.remotePlatform": {
-    "juiced.io": "linux",
-    "next.juiced.io": "linux"
-  },
-  "security.workspace.trust.untrustedFiles": "open",
-  "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "javascript.updateImportsOnFileMove.enabled": "always",
-  "explorer.confirmDragAndDrop": false,
-  "redhat.telemetry.enabled": false,
-  "eslint.run": "onType",
-  "workbench.sideBar.location": "right",
-  "window.commandCenter": true,
-  "editor.minimap.enabled": false,
-  "sqltools.useNodeRuntime": true,
-  "workbench.colorTheme": "Gruvbox Dark Hard",
-  "go.toolsManagement.autoUpdate": true
+	"vim.incsearch": true,
+	"vim.hlsearch": true,
+	"vim.insertModeKeyBindings": [
+		{
+			"before": ["j", "j"],
+			"after": ["<Esc>"]
+		}
+	],
+	"vim.normalModeKeyBindingsNonRecursive": [
+		{
+			"before": ["<leader>", "s"],
+			"commands": ["workbench.action.files.save"]
+		},
+		{
+			"before": ["<leader>", "e"],
+			"commands": [":q"]
+		},
+		{
+			"before": ["<leader>", "f"],
+			"commands": ["workbench"]
+		},
+		{
+			"before": ["<C-l>"],
+			"commands": ["workbench.action.focusRightGroup"]
+		},
+		{
+			"before": ["<C-h>"],
+			"commands": ["workbench.action.focusLeftGroup"]
+		},
+		{
+			"before": ["<C-j>"],
+			"commands": ["workbench.action.focusBelowGroup"]
+		},
+		{
+			"before": ["<C-k>"],
+			"commands": ["workbench.action.focusAboveGroup"]
+		},
+		{
+			"before": ["<C-b>"],
+			"commands": ["workbench.action.toggleSidebarVisibility"]
+		},
+		{
+			"before": ["g", "d"],
+			"commands": ["editor.action.peekDefinition"]
+		},
+		{
+			"before": ["g", "r"],
+			"commands": ["editor.action.goToReferences"]
+		},
+		{
+			"before": ["<leader>", "a", "c"],
+			"commands": ["editor.action.codeAction"]
+		},
+		{
+			"before": ["<leader>", "c", "c"],
+			"commands": ["editor.action.commentLine"]
+		},
+		{
+			"before": ["<leader>", "f"],
+			"commands": ["editor.action.formatDocument"]
+		}
+	],
+	"vim.visualModeKeyBindings": [
+		{
+			"before": ["<leader>", "c", "c"],
+			"commands": ["editor.action.commentTrigger"]
+		}
+	],
+	"vim.leader": "<space>",
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "vscode.html-language-features"
+	},
+	"liveServer.settings.donotShowInfoMsg": true,
+	"git.confirmSync": false,
+	"i18n-ally.displayLanguage": "en",
+	"[python]": {
+		"editor.formatOnType": true
+	},
+	"vim.cursorStylePerMode.insert": "line-thin",
+	"vim.cursorStylePerMode.normal": "block-outline",
+	"[php]": {
+		"editor.defaultFormatter": "DEVSENSE.phptools-vscode"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "vscode.css-language-features"
+	},
+	"markdown-preview-enhanced.liveUpdate": false,
+	"[dockercompose]": {
+		"editor.defaultFormatter": "ms-azuretools.vscode-docker"
+	},
+	"remote.SSH.remotePlatform": {
+		"juiced.io": "linux",
+		"next.juiced.io": "linux"
+	},
+	"security.workspace.trust.untrustedFiles": "open",
+	"[markdown]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"explorer.confirmDragAndDrop": false,
+	"redhat.telemetry.enabled": false,
+	"eslint.run": "onType",
+	"workbench.sideBar.location": "right",
+	"window.commandCenter": true,
+	"editor.minimap.enabled": false,
+	"sqltools.useNodeRuntime": true,
+	"workbench.colorTheme": "Gruvbox Dark Hard",
+	"go.toolsManagement.autoUpdate": true
 }

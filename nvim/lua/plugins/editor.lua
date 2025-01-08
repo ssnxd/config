@@ -54,7 +54,7 @@ return {
 			vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "Search [G]it [F]iles" })
 			vim.keymap.set("n", "<C-g>", builtin.find_files, { desc = "Search [F]iles" })
 			vim.keymap.set("n", "<C-s>", builtin.live_grep, { desc = "Search working dir" })
-			vim.keymap.set("n", "<C-r>", builtin.resume, { desc = "Resume search" })
+			vim.keymap.set("n", "<C-l>", builtin.resume, { desc = "Resume search" })
 			vim.keymap.set("n", "<leader>cb", neoclip, { desc = "Search clipboard" })
 		end,
 	},

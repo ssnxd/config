@@ -47,7 +47,7 @@ return {
 					vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
 					vim.keymap.set("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
 					vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", opts)
-					vim.keymap.set("n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
+					vim.keymap.set("n", "gS", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
 
 					-- Code actions
 					vim.keymap.set("n", "<F2>", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
@@ -138,4 +138,7 @@ return {
 			require("lspkind").init()
 		end,
 	},
+
+	-- Extension to lsp
+	"github/copilot.vim",
 }

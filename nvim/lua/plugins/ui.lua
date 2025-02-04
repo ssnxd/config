@@ -18,9 +18,9 @@ return {
 
 			require("lualine").setup({
 				options = {
-					icons_enabled = false,
-					component_separators = "|",
-					section_separators = "",
+					icons_enabled = true,
+					component_separators = "",
+					section_separators = { left = "", right = "" },
 				},
 				sections = {
 					lualine_a = { "mode" },
@@ -63,6 +63,19 @@ return {
 			-- 	---Block-comment toggle keymap
 			-- 	block = 'gbc',
 			-- },
+		},
+	},
+
+	{
+		"nanozuki/tabby.nvim",
+		-- event = 'VimEnter', -- if you want lazy load, see below
+		dependencies = "nvim-tree/nvim-web-devicons",
+		opts = {
+			preset = "active_wins_at_tail",
+			option = {
+				nerdfont = true, -- whether use nerdfont
+				lualine_theme = "dracula", -- lualine theme name
+			},
 		},
 	},
 }

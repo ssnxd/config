@@ -23,9 +23,20 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		branch = "0.1.x",
-		dependencies = { "nvim-lua/plenary.nvim" },
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"AckslD/nvim-neoclip.lua",
+			{
+				"nvim-telescope/telescope-fzf-native.nvim",
+				-- NOTE: If you are having trouble with this installation,
+				--       refer to the README for telescope-fzf-native for more instructions.
+				build = "make",
+			},
+		},
 		config = function()
 			local themes = require("telescope.themes")
+
+			require("neoclip").setup()
 
 			require("telescope").setup({
 				defaults = vim.tbl_deep_extend("force", themes.get_dropdown(), {
@@ -54,29 +65,11 @@ return {
 			vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "Search [G]it [F]iles" })
 			vim.keymap.set("n", "<C-g>", builtin.find_files, { desc = "Search [F]iles" })
 			vim.keymap.set("n", "<C-s>", builtin.live_grep, { desc = "Search working dir" })
-			vim.keymap.set("n", "<C-l>", builtin.resume, { desc = "Resume search" })
+			vim.keymap.set("n", "<C-rs>", builtin.resume, { desc = "Resume search" })
 			vim.keymap.set("n", "<leader>cb", neoclip, { desc = "Search clipboard" })
 		end,
 	},
 
-	-- Fuzzy Finder Algorithm which requires local dependencies to be built.
-	-- Only load if `make` is available. Make sure you have the system
-	-- requirements installed.
-	{
-		"nvim-telescope/telescope-fzf-native.nvim",
-		-- NOTE: If you are having trouble with this installation,
-		--       refer to the README for telescope-fzf-native for more instructions.
-		build = "make",
-	},
-	{
-		"AckslD/nvim-neoclip.lua",
-		dependencies = {
-			{ "nvim-telescope/telescope.nvim" },
-		},
-		config = function()
-			require("neoclip").setup()
-		end,
-	},
 	{
 		-- Highlight, edit, and navigate code
 		"nvim-treesitter/nvim-treesitter",
@@ -100,11 +93,13 @@ return {
 					"vim",
 				},
 
+				cc = "zig", -- The C/C++ compiler to use for C/C++ files
+
 				-- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
 				auto_install = false,
 
-				highlight = { enable = false },
-				indent = { enable = true },
+				highlight = { enable = true },
+				indent = { enable = false },
 				incremental_selection = {
 					enable = true,
 					keymaps = {
@@ -162,11 +157,13 @@ return {
 		end,
 	},
 	{
-		"akinsho/toggleterm.nvim",
-		version = "*",
-		opts = {
-			open_mapping = [[<c-\>]],
-		},
+		"stevearc/oil.nvim",
+		---@module 'oil'
+		---@type oil.SetupOpts
+		opts = {},
+		-- Optional dependencies
+		dependencies = { { "echasnovski/mini.icons", opts = {} } },
+		lazy = false,
 	},
 	{
 		"lewis6991/gitsigns.nvim",
@@ -188,11 +185,5 @@ return {
 				desc = "Buffer Local Keymaps (which-key)",
 			},
 		},
-	},
-	{
-		"nanozuki/tabby.nvim",
-		-- event = 'VimEnter', -- if you want lazy load, see below
-		dependencies = "nvim-tree/nvim-web-devicons",
-		opts = {},
 	},
 }

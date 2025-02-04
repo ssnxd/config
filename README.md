@@ -1,5 +1,1 @@
-# Config files
-
-- nvim
-- tmux
-- vscode
+# ssnxd's configs

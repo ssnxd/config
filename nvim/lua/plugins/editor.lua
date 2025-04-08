@@ -19,57 +19,64 @@ return {
 		config = true,
 		opts = {},
 	},
-
 	{
-		"nvim-telescope/telescope.nvim",
-		branch = "0.1.x",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"AckslD/nvim-neoclip.lua",
-			{
-				"nvim-telescope/telescope-fzf-native.nvim",
-				-- NOTE: If you are having trouble with this installation,
-				--       refer to the README for telescope-fzf-native for more instructions.
-				build = "make",
-			},
-		},
+		"ibhagwan/fzf-lua",
+		-- optional for icon support
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
-			local themes = require("telescope.themes")
-
-			require("neoclip").setup()
-
-			require("telescope").setup({
-				defaults = vim.tbl_deep_extend("force", themes.get_dropdown(), {
-					file_ignore_patterns = { ".git", "^node_modules", "target" },
-					path_display = { "truncate" },
-					selection_caret = "  ",
-					mappings = {
-						i = {
-							["<C-u>"] = false,
-							["<C-d>"] = false,
-						},
-					},
-				}),
-
-				extensions = {},
+			require("fzf-lua").setup({
+				"hide",
 			})
-			-- Enable telescope fzf native, if installed
-			pcall(require("telescope").load_extension, "fzf")
 
-			local builtin = require("telescope.builtin")
+			-- Buffers
+			vim.api.nvim_set_keymap(
+				"n",
+				"<C-\\>",
+				"<cmd>lua require('fzf-lua').buffers()<CR>",
+				{ noremap = true, silent = true }
+			)
 
-			local function neoclip()
-				vim.cmd([[:Telescope neoclip]])
-			end
+			-- files
+			vim.api.nvim_set_keymap(
+				"n",
+				"<C-p>",
+				"<cmd>lua require('fzf-lua').files()<CR>",
+				{ noremap = true, silent = true }
+			)
 
-			vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "Search [G]it [F]iles" })
-			vim.keymap.set("n", "<C-g>", builtin.find_files, { desc = "Search [F]iles" })
-			vim.keymap.set("n", "<C-s>", builtin.live_grep, { desc = "Search working dir" })
-			vim.keymap.set("n", "<C-rs>", builtin.resume, { desc = "Resume search" })
-			vim.keymap.set("n", "<leader>cb", neoclip, { desc = "Search clipboard" })
+			-- grep
+			vim.api.nvim_set_keymap(
+				"n",
+				"<C-G>",
+				"<cmd>lua require('fzf-lua').grep()<CR>",
+				{ noremap = true, silent = true }
+			)
+
+			-- live grep
+			vim.api.nvim_set_keymap(
+				"n",
+				"<C-g>",
+				"<cmd>lua require('fzf-lua').live_grep()<CR>",
+				{ noremap = true, silent = true }
+			)
+
+			-- symbols
+			vim.api.nvim_set_keymap(
+				"n",
+				"<C-m>",
+				"<cmd>lua require('fzf-lua').marks()<CR>",
+				{ noremap = true, silent = true }
+			)
+
+			-- builtin
+			-- vim.api.nvim_set_keymap(
+			-- 	"n",
+			-- 	"<C-k>",
+			-- 	"<cmd>lua require('fzf-lua').builtin()<CR>",
+			-- 	{ noremap = true, silent = true }
+			-- )
 		end,
 	},
-
 	{
 		-- Highlight, edit, and navigate code
 		"nvim-treesitter/nvim-treesitter",
@@ -157,6 +164,15 @@ return {
 		end,
 	},
 	{
+		"stevearc/aerial.nvim",
+		opts = {},
+		-- Optional dependencies
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			"nvim-tree/nvim-web-devicons",
+		},
+	},
+	{
 		"stevearc/oil.nvim",
 		---@module 'oil'
 		---@type oil.SetupOpts
@@ -173,17 +189,7 @@ return {
 		end,
 	},
 	{
-		"folke/which-key.nvim",
-		event = "VeryLazy",
+		"numToStr/Comment.nvim",
 		opts = {},
-		keys = {
-			{
-				"<leader>?",
-				function()
-					require("which-key").show({ global = false })
-				end,
-				desc = "Buffer Local Keymaps (which-key)",
-			},
-		},
 	},
 }

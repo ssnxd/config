@@ -1,6 +1,7 @@
 local ensure_installed = {
 	"lua_ls",
 	"ts_ls",
+	"angularls",
 	"gopls",
 	"biome",
 	"html",
@@ -13,26 +14,27 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
-			{ "williamboman/mason.nvim" },
-			{ "williamboman/mason-lspconfig.nvim" },
-			{ "hrsh7th/nvim-cmp" },
-			{ "hrsh7th/cmp-nvim-lsp" },
-			{ "hrsh7th/cmp-buffer" },
-			{ "hrsh7th/cmp-path" },
-			{ "hrsh7th/cmp-cmdline" },
-			{ "hrsh7th/cmp-vsnip" },
-			{ "hrsh7th/vim-vsnip" },
-			{ "rafamadriz/friendly-snippets" },
-			{ "stevearc/conform.nvim" },
-			{ "onsails/lspkind.nvim" },
-		},
-		config = function()
-			-- note: diagnostics are not exclusive to lsp servers
-			-- so these can be global keybindings
-			vim.keymap.set("n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>")
-			vim.keymap.set("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>")
-			vim.keymap.set("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>")
 
+			-- completion engine
+			{ "saghen/blink.cmp", version = "1.*", opts_extend = { "sources.default" } },
+			"rafamadriz/friendly-snippets",
+
+			-- auto manage lsp servers
+			"williamboman/mason.nvim",
+			"williamboman/mason-lspconfig.nvim",
+
+			-- Formater
+			"stevearc/conform.nvim",
+
+			-- AI code completion
+			"olimorris/codecompanion.nvim",
+			"nvim-lua/plenary.nvim",
+			"nvim-treesitter/nvim-treesitter",
+			"j-hui/fidget.nvim",
+			"github/copilot.vim",
+		},
+
+		config = function()
 			vim.api.nvim_create_autocmd("LspAttach", {
 				desc = "LSP actions",
 				callback = function(event)
@@ -41,71 +43,32 @@ return {
 					-- these will be buffer-local keybindings
 					-- because they only work if you have an active language server
 
-					vim.keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<cr>", opts)
-					vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
-					vim.keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
-					vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", opts)
-					vim.keymap.set("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>", opts)
-					vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", opts)
-					vim.keymap.set("n", "gS", "<cmd>lua vim.lsp.buf.signature_help()<cr>", opts)
+					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+					vim.keymap.set("n", "go", vim.lsp.buf.type_definition, opts)
+					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+					vim.keymap.set("n", "gS", vim.lsp.buf.signature_help, opts)
 
 					-- Code actions
-					vim.keymap.set("n", "<F2>", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
+					vim.keymap.set("n", "<F2>", vim.lsp.buf.code_action, opts)
 
 					-- Rename
-					vim.keymap.set("n", "<F3>", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
+					vim.keymap.set("n", "<F3>", vim.lsp.buf.rename, opts)
+
+					-- Diagnostic navigation
+					vim.keymap.set("n", "gl", vim.diagnostic.open_float, opts)
+					vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+					vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 				end,
 			})
 
-			local cmp = require("cmp")
-
-			cmp.setup({
-				snippet = {
-					expand = function(args)
-						vim.fn["vsnip#anonymous"](args.body)
-					end,
-				},
-				window = {
-					completion = cmp.config.window.bordered(),
-					documentation = cmp.config.window.bordered(),
-				},
-				mapping = cmp.mapping.preset.insert({
-					-- Enter key confirms completion item
-					["<CR>"] = cmp.mapping.confirm({ select = false }),
-
-					-- Ctrl + space triggers completion menu
-					["<C-Space>"] = cmp.mapping.complete(),
-				}),
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "vsnip" },
-				}, {
-					{ name = "buffer" },
-				}),
-			})
-
-			cmp.setup.cmdline({ "/", "?" }, {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = {
-					{ name = "buffer" },
-				},
-			})
-
-			cmp.setup.cmdline(":", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({
-					{ name = "path" },
-				}, {
-					{ name = "cmdline" },
-				}),
-				matching = { disallow_symbol_nonprefix_matching = false },
-			})
-
-			local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 			local default_setup = function(server)
 				require("lspconfig")[server].setup({
-					capabilities = lsp_capabilities,
+					capabilities = capabilities,
 				})
 			end
 
@@ -135,10 +98,72 @@ return {
 				},
 			})
 
-			require("lspkind").init()
+			-- Create explicit formatting command
+			vim.api.nvim_create_user_command("Format", function()
+				require("conform").format({ async = true })
+			end, {})
+
+			-- AI code completion
+			require("codecompanion").setup({
+				adapters = {
+					copilot = function()
+						return require("codecompanion.adapters").extend("copilot", {
+							schema = {
+								model = {
+									default = "claude-3.7-sonnet",
+								},
+							},
+						})
+					end,
+				},
+			})
+
+			-- Blink
+			require("blink.cmp").setup({
+				keymap = { preset = "default" },
+				appearance = {
+					nerd_font_variant = "mono",
+				},
+
+				completion = {
+					accept = {
+						-- experimental auto-brackets support
+						auto_brackets = {
+							enabled = true,
+						},
+					},
+					menu = {
+						draw = {
+							treesitter = { "lsp" },
+						},
+					},
+					documentation = {
+						auto_show = true,
+						auto_show_delay_ms = 200,
+					},
+					ghost_text = {
+						enabled = vim.g.ai_cmp,
+					},
+				},
+
+				-- Default list of enabled providers defined so that you can extend it
+				-- elsewhere in your config, without redefining it, due to `opts_extend`
+				sources = {
+					default = { "lsp", "path", "snippets", "buffer" },
+					per_filetype = { "codecompanion" },
+				},
+				cmdline = {
+					enabled = false,
+				},
+
+				-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
+				-- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
+				-- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
+				--
+				-- See the fuzzy documentation for more information
+				fuzzy = { implementation = "prefer_rust_with_warning" },
+				signature = { enabled = true },
+			})
 		end,
 	},
-
-	-- Extension to lsp
-	"github/copilot.vim",
 }

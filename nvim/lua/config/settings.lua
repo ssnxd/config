@@ -47,3 +47,6 @@ vim.g.have_nerd_font = true
 
 -- Session restore
 vim.opt.sessionoptions = "curdir,folds,globals,help,tabpages,terminal,winsize"
+
+-- ui
+vim.opt.winborder = "single"

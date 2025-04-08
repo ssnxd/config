@@ -1,14 +1,30 @@
 return {
-
 	{
-		"dracula/vim",
-		lazy = false,
+		"sainnhe/gruvbox-material",
 		priority = 1000,
 		config = function()
-			vim.cmd.colorscheme("dracula")
+			vim.o.background = "dark"
+
+			vim.g.gruvbox_material_background = "hard"
+			vim.g.gruvbox_material_enable_italic = true
+			-- vim.g.gruvbox_material_transparent_background = 1
+			vim.g.gruvbox_material_dim_inactive_windows = 1
+			vim.cmd.colorscheme("gruvbox-material")
 		end,
 	},
-
+	{
+		"nanozuki/tabby.nvim",
+		-- event = 'VimEnter', -- if you want lazy load, see below
+		dependencies = "nvim-tree/nvim-web-devicons",
+		opts = {
+			preset = "active_wins_at_tail",
+			option = {
+				nerdfont = true, -- whether use nerdfont
+				lualine_theme = "gruvbox-material", -- lualine theme name
+				section_separators = { left = "", right = "" }, -- separators for sections
+			},
+		},
+	},
 	{
 		"nvim-lualine/lualine.nvim",
 		config = function()
@@ -18,9 +34,10 @@ return {
 
 			require("lualine").setup({
 				options = {
+					theme = "gruvbox-material",
 					icons_enabled = true,
 					component_separators = "",
-					section_separators = { left = "", right = "" },
+					section_separators = { left = "", right = "" },
 				},
 				sections = {
 					lualine_a = { "mode" },
@@ -47,34 +64,17 @@ return {
 		main = "ibl",
 		opts = {},
 	},
-	-- Normal mode
-	-- "gcc" to line comment
-	-- "gbc" to block comment
-	-- Visual mode
-	-- "gc" to line comment
-	-- "gb" to block comment
 	{
-		"numToStr/Comment.nvim",
-		opts = {
-			---LHS of toggle mappings in NORMAL mode
-			-- toggler = {
-			-- 	---Line-comment toggle keymap
-			-- 	line = '',
-			-- 	---Block-comment toggle keymap
-			-- 	block = 'gbc',
-			-- },
-		},
-	},
-
-	{
-		"nanozuki/tabby.nvim",
-		-- event = 'VimEnter', -- if you want lazy load, see below
-		dependencies = "nvim-tree/nvim-web-devicons",
-		opts = {
-			preset = "active_wins_at_tail",
-			option = {
-				nerdfont = true, -- whether use nerdfont
-				lualine_theme = "dracula", -- lualine theme name
+		"folke/which-key.nvim",
+		event = "VeryLazy",
+		opts = {},
+		keys = {
+			{
+				"<leader>?",
+				function()
+					require("which-key").show({ global = false })
+				end,
+				desc = "Buffer Local Keymaps (which-key)",
 			},
 		},
 	},

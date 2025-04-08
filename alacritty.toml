@@ -1,5 +1,5 @@
 [font]
-size = 16.0
+size = 18.0
 
 [font.bold]
 family = "MonaspiceNe Nerd Font"
@@ -15,7 +15,7 @@ family = "MonaspiceAr Nerd Font"
 [window]
 decorations = "buttonless"
 opacity = 0.8
-startup_mode = "Windowed"
+startup_mode = "Fullscreen"
 
 [window.padding]
 x = 0

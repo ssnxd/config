@@ -40,7 +40,7 @@ vim.o.completeopt = "menuone,noselect"
 
 vim.o.termguicolors = true
 vim.o.cursorline = true
-vim.o.showtabline = 2
+vim.o.showtabline = 1
 vim.o.syntax = "enable"
 
 vim.g.have_nerd_font = true
@@ -50,3 +50,4 @@ vim.opt.sessionoptions = "curdir,folds,globals,help,tabpages,terminal,winsize"
 
 -- ui
 vim.opt.winborder = "single"
+vim.o.tabstop = 4

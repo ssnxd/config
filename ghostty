@@ -4,7 +4,7 @@ window-padding-y = 5
 window-padding-x = 5
 macos-titlebar-style = hidden
 
-font-size = 18.0
+font-size = 16.0
 font-family = "MonaspiceAr Nerd Font"
 font-family-bold = "MonaspiceNe Nerd Font"
 font-family-bold-italic = "MonaspiceNe Nerd Font"

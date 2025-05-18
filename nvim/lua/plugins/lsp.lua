@@ -27,11 +27,17 @@ return {
 			"stevearc/conform.nvim",
 
 			-- AI code completion
-			"olimorris/codecompanion.nvim",
-			"nvim-lua/plenary.nvim",
-			"nvim-treesitter/nvim-treesitter",
+			{
+				"olimorris/codecompanion.nvim",
+				dependencies = {
+					"nvim-lua/plenary.nvim",
+					"nvim-treesitter/nvim-treesitter",
+				},
+			},
+
+
 			"j-hui/fidget.nvim",
-			"github/copilot.vim",
+			"zbirenbaum/copilot.lua",
 		},
 
 		config = function()
@@ -91,17 +97,22 @@ return {
 					typescriptreact = { "biome-check" },
 					json = { "biome-check" },
 				},
-				format_on_save = {
+				--[[ format_on_save = {
 					-- These options will be passed to conform.format()
 					timeout_ms = 500,
 					lsp_format = "fallback",
-				},
+				}, ]]
 			})
 
 			-- Create explicit formatting command
 			vim.api.nvim_create_user_command("Format", function()
 				require("conform").format({ async = true })
 			end, {})
+
+
+			-- Copilot
+			require("copilot").setup({})
+
 
 			-- AI code completion
 			require("codecompanion").setup({
@@ -165,5 +176,6 @@ return {
 				signature = { enabled = true },
 			})
 		end,
-	},
+
+	}
 }

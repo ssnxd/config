@@ -82,6 +82,10 @@ return {
 			indent = {
 				char = "┆",
 			},
+			scope = {
+				char = "|",
+				show_start = true,
+			}
 		},
 	},
 	{

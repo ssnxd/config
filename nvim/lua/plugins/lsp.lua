@@ -38,6 +38,7 @@ return {
 
 			"j-hui/fidget.nvim",
 			"zbirenbaum/copilot.lua",
+			"fang2hou/blink-copilot"
 		},
 
 		config = function()
@@ -78,6 +79,14 @@ return {
 				})
 			end
 
+
+			-- Copilot
+			require("copilot").setup({
+				suggestion = { enabled = false },
+				panel = { enabled = false },
+			})
+
+
 			require("mason").setup({})
 			require("mason-lspconfig").setup({
 				ensure_installed = ensure_installed,
@@ -109,9 +118,6 @@ return {
 				require("conform").format({ async = true })
 			end, {})
 
-
-			-- Copilot
-			require("copilot").setup({})
 
 
 			-- AI code completion
@@ -146,6 +152,33 @@ return {
 					menu = {
 						draw = {
 							treesitter = { "lsp" },
+							components = {
+								kind_icon = {
+									text = function(ctx)
+										-- Check if the completion is from Copilot
+										if ctx.source_name == "copilot" then
+											-- Return a Copilot icon (using a GitHub icon or similar)
+											return ""  -- GitHub icon from Nerd Fonts
+										else
+											-- Default behavior for LSP and other sources
+											local kind_icon, _, _ = require('mini.icons').get('lsp', ctx.kind)
+											return kind_icon
+										end
+									end,
+									-- (optional) use highlights from mini.icons
+									highlight = function(ctx)
+										local _, hl, _ = require('mini.icons').get('lsp', ctx.kind)
+										return hl
+									end,
+								},
+								kind = {
+									-- (optional) use highlights from mini.icons
+									highlight = function(ctx)
+										local _, hl, _ = require('mini.icons').get('lsp', ctx.kind)
+										return hl
+									end,
+								}
+							}
 						},
 					},
 					documentation = {
@@ -160,8 +193,16 @@ return {
 				-- Default list of enabled providers defined so that you can extend it
 				-- elsewhere in your config, without redefining it, due to `opts_extend`
 				sources = {
-					default = { "lsp", "path", "snippets", "buffer" },
+					default = { "lsp", "path", "snippets", "buffer", "copilot" },
 					per_filetype = { "codecompanion" },
+					providers = {
+						copilot = {
+							name = "copilot",
+							module = "blink-copilot",
+							score_offset = 100,
+							async = true,
+						},
+					},
 				},
 				cmdline = {
 					enabled = false,

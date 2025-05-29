@@ -83,8 +83,9 @@ return {
 				char = "┆",
 			},
 			scope = {
-				char = "|",
+				char = { "│" },
 				show_start = true,
+				show_exact_scope = true,
 			}
 		},
 	},

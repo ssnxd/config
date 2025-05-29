@@ -34,11 +34,8 @@ return {
 					"nvim-treesitter/nvim-treesitter",
 				},
 			},
-
-
-			"j-hui/fidget.nvim",
 			"zbirenbaum/copilot.lua",
-			"fang2hou/blink-copilot"
+			"fang2hou/blink-copilot",
 		},
 
 		config = function()
@@ -47,22 +44,42 @@ return {
 				callback = function(event)
 					local opts = { buffer = event.buf }
 
-					-- these will be buffer-local keybindings
-					-- because they only work if you have an active language server
-
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+					-- Go To commands
+					-- Go to Definition
 					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-					vim.keymap.set("n", "go", vim.lsp.buf.type_definition, opts)
+
+					-- Go to References
 					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-					vim.keymap.set("n", "gS", vim.lsp.buf.signature_help, opts)
 
-					-- Code actions
-					vim.keymap.set("n", "<F2>", vim.lsp.buf.code_action, opts)
+					-- Go to Implementation
+					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 
-					-- Rename
-					vim.keymap.set("n", "<F3>", vim.lsp.buf.rename, opts)
+					-- Go to Type Definition
+					vim.keymap.set("n", "gT", vim.lsp.buf.type_definition, opts)
+
+					-- Go to Declaration
+					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+
+					-- Find all references
+					vim.keymap.set("n", "<leader>fr", vim.lsp.buf.references, opts)
+
+					-- Peek Definition (Alt+F12 in VSCode)
+					-- This requires a floating window implementation
+					-- We'll provide a simple one below
+					vim.keymap.set("n", "<leader>pd", function()
+						-- Open definition in a floating window
+						local params = vim.lsp.util.make_position_params()
+						vim.lsp.buf_request(0, "textDocument/definition", params, function(_, result, _, _)
+							if result and result[1] then
+								vim.lsp.util.preview_location(result[1])
+							end
+						end)
+					end, opts)
+
+					-- Additional useful LSP commands
+					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+					vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
 
 					-- Diagnostic navigation
 					vim.keymap.set("n", "gl", vim.diagnostic.open_float, opts)
@@ -79,13 +96,11 @@ return {
 				})
 			end
 
-
 			-- Copilot
 			require("copilot").setup({
 				suggestion = { enabled = false },
 				panel = { enabled = false },
 			})
-
 
 			require("mason").setup({})
 			require("mason-lspconfig").setup({
@@ -118,8 +133,6 @@ return {
 				require("conform").format({ async = true })
 			end, {})
 
-
-
 			-- AI code completion
 			require("codecompanion").setup({
 				adapters = {
@@ -127,7 +140,7 @@ return {
 						return require("codecompanion.adapters").extend("copilot", {
 							schema = {
 								model = {
-									default = "claude-3.7-sonnet",
+									default = "gpt-4.1",
 								},
 							},
 						})
@@ -157,28 +170,27 @@ return {
 									text = function(ctx)
 										-- Check if the completion is from Copilot
 										if ctx.source_name == "copilot" then
-											-- Return a Copilot icon (using a GitHub icon or similar)
-											return ""  -- GitHub icon from Nerd Fonts
+											return "" -- GitHub icon from Nerd Fonts
 										else
 											-- Default behavior for LSP and other sources
-											local kind_icon, _, _ = require('mini.icons').get('lsp', ctx.kind)
+											local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
 											return kind_icon
 										end
 									end,
 									-- (optional) use highlights from mini.icons
 									highlight = function(ctx)
-										local _, hl, _ = require('mini.icons').get('lsp', ctx.kind)
+										local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
 										return hl
 									end,
 								},
 								kind = {
 									-- (optional) use highlights from mini.icons
 									highlight = function(ctx)
-										local _, hl, _ = require('mini.icons').get('lsp', ctx.kind)
+										local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
 										return hl
 									end,
-								}
-							}
+								},
+							},
 						},
 					},
 					documentation = {
@@ -205,7 +217,11 @@ return {
 					},
 				},
 				cmdline = {
-					enabled = false,
+					enabled = true,
+					sources = {
+						"cmdline",
+						"path",
+					},
 				},
 
 				-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
@@ -217,6 +233,5 @@ return {
 				signature = { enabled = true },
 			})
 		end,
-
-	}
+	},
 }

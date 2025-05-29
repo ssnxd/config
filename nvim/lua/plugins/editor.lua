@@ -28,53 +28,17 @@ return {
 				"hide",
 			})
 
+			local opts = { noremap = true, silent = true }
 			-- Buffers
-			vim.api.nvim_set_keymap(
-				"n",
-				"<C-\\>",
-				"<cmd>lua require('fzf-lua').buffers()<CR>",
-				{ noremap = true, silent = true }
-			)
-
+			vim.api.nvim_set_keymap("n", "<C-\\>", "<cmd>lua require('fzf-lua').buffers()<CR>", opts)
 			-- files
-			vim.api.nvim_set_keymap(
-				"n",
-				"<C-p>",
-				"<cmd>lua require('fzf-lua').files()<CR>",
-				{ noremap = true, silent = true }
-			)
-
-			-- grep
-			vim.api.nvim_set_keymap(
-				"n",
-				"<C-G>",
-				"<cmd>lua require('fzf-lua').grep()<CR>",
-				{ noremap = true, silent = true }
-			)
-
+			vim.api.nvim_set_keymap("n", "<C-p>", "<cmd>lua require('fzf-lua').files()<CR>", opts)
 			-- live grep
-			vim.api.nvim_set_keymap(
-				"n",
-				"<C-g>",
-				"<cmd>lua require('fzf-lua').live_grep()<CR>",
-				{ noremap = true, silent = true }
-			)
-
-			-- symbols
-			vim.api.nvim_set_keymap(
-				"n",
-				"<C-m>",
-				"<cmd>lua require('fzf-lua').marks()<CR>",
-				{ noremap = true, silent = true }
-			)
-
-			-- builtin
-			-- vim.api.nvim_set_keymap(
-			-- 	"n",
-			-- 	"<C-k>",
-			-- 	"<cmd>lua require('fzf-lua').builtin()<CR>",
-			-- 	{ noremap = true, silent = true }
-			-- )
+			vim.api.nvim_set_keymap("n", "<C-s>", "<cmd>lua require('fzf-lua').live_grep()<CR>", opts)
+			-- grep word
+			vim.api.nvim_set_keymap("n", "<C-S>", "<cmd>lua require('fzf-lua').grep_cword()<CR>", opts)
+			-- Marks
+			vim.api.nvim_set_keymap("n", "<C-m>", "<cmd>lua require('fzf-lua').marks()<CR>", opts)
 		end,
 	},
 	{
@@ -174,12 +138,31 @@ return {
 	},
 	{
 		"stevearc/oil.nvim",
-		---@module 'oil'
-		---@type oil.SetupOpts
-		opts = {},
-		-- Optional dependencies
 		dependencies = { { "echasnovski/mini.icons", opts = {} } },
 		lazy = false,
+		config = function()
+			require("oil").setup({
+				columns = { "icon", "size" },
+				keymaps = {
+					["<C-h>"] = false,
+					["<M-h>"] = "actions.select_split",
+				},
+				view_options = {
+					show_hidden = true, -- Show hidden files by default
+				},
+			})
+
+			-- Open parent directory in current window
+			vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+			-- Open parent directory in a floating window
+			vim.keymap.set(
+				"n",
+				"<space>-",
+				require("oil").toggle_float,
+				{ desc = "Open parent directory in a floating window" }
+			)
+		end,
 	},
 	{
 		"lewis6991/gitsigns.nvim",
@@ -191,5 +174,34 @@ return {
 	{
 		"numToStr/Comment.nvim",
 		opts = {},
+	},
+	{
+		"j-hui/fidget.nvim",
+		opts = {},
+	},
+	{
+		"folke/noice.nvim",
+		event = "VeryLazy",
+		opts = {
+			lsp = {
+				-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+				override = {
+					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+					["vim.lsp.util.stylize_markdown"] = true,
+					["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+				},
+			},
+			-- you can enable a preset for easier configuration
+			presets = {
+				bottom_search = true, -- use a classic bottom cmdline for search
+				command_palette = true, -- position the cmdline and popupmenu together
+				long_message_to_split = true, -- long messages will be sent to a split
+				inc_rename = true, -- enables an input dialog for inc-rename.nvim
+				lsp_doc_border = true, -- add a border to hover docs and signature help
+			},
+		},
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+		},
 	},
 }

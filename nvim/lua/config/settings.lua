@@ -1,53 +1,78 @@
--- disable netrw for nvim-tree
--- vim.g.loaded_netrw = 1
--- vim.g.loaded_netrwPlugin = 1
+-- Core Neovim settings and options
+-- Configure editor behavior, UI, and performance
 
-vim.o.backup = false
-vim.o.writebackup = false
+---------------------------------------------------------------------------
+-- Performance
+---------------------------------------------------------------------------
+vim.o.backup = false          -- Don't create backup files
+vim.o.writebackup = false     -- Don't create backup before overwriting
+vim.o.swapfile = false        -- Disable swap files
+vim.o.undofile = true         -- Enable persistent undo
+vim.o.updatetime = 200        -- Faster completion (default: 4000ms)
+vim.o.timeoutlen = 300        -- Time to wait for mapped sequence
 
--- Set highlight on search
-vim.o.hlsearch = false
+---------------------------------------------------------------------------
+-- UI/UX
+---------------------------------------------------------------------------
+vim.o.termguicolors = true    -- Enable 24-bit RGB color
+vim.o.cursorline = true       -- Highlight current line
+vim.o.number = true           -- Show line numbers
+vim.o.relativenumber = true   -- Show relative line numbers
+vim.o.signcolumn = "yes"      -- Always show sign column
+vim.o.showmode = false        -- Don't show mode (lualine shows it)
+vim.o.showtabline = 2         -- Always show tabline
+vim.o.laststatus = 3          -- Global statusline across splits
+vim.o.cmdheight = 1           -- Command line height
+vim.o.pumheight = 10          -- Popup menu height
+vim.o.scrolloff = 8           -- Lines to keep above/below cursor
+vim.o.sidescrolloff = 8       -- Columns to keep left/right of cursor
+vim.o.fillchars = "eob: ,fold: ,foldopen:▾,foldsep: ,foldclose:▸"  -- Custom fill chars
 
--- Make line numbers default
-vim.wo.relativenumber = true
-vim.wo.number = true
+---------------------------------------------------------------------------
+-- Search
+---------------------------------------------------------------------------
+vim.o.hlsearch = false        -- Don't highlight search results
+vim.o.ignorecase = true       -- Ignore case in search
+vim.o.smartcase = true        -- Override ignorecase if uppercase used
+vim.o.inccommand = "split"    -- Live preview of substitutions
 
--- Enable mouse mode
-vim.o.mouse = "a"
+---------------------------------------------------------------------------
+-- Editing
+---------------------------------------------------------------------------
+vim.o.mouse = "a"             -- Enable mouse in all modes
+vim.o.clipboard = "unnamedplus"  -- Use system clipboard
+vim.o.breakindent = true      -- Indent wrapped lines
+vim.o.smartindent = true      -- Smart autoindenting
+vim.o.wrap = false            -- Don't wrap lines
+vim.o.expandtab = true        -- Use spaces instead of tabs
+vim.o.tabstop = 2             -- Tab width
+vim.o.shiftwidth = 2          -- Indent width
+vim.o.shiftround = true       -- Round indent to multiple of shiftwidth
 
--- Sync clipboard between OS and Neovim.
-vim.o.clipboard = "unnamedplus"
+---------------------------------------------------------------------------
+-- Completion
+---------------------------------------------------------------------------
+vim.o.completeopt = "menu,menuone,noselect"  -- Completion options
+vim.o.pumblend = 10           -- Popup menu transparency
+vim.o.winblend = 10           -- Window transparency
 
--- Enable break indent
-vim.o.breakindent = true
+---------------------------------------------------------------------------
+-- Session
+---------------------------------------------------------------------------
+vim.opt.sessionoptions = { 
+  "buffers", "curdir", "tabpages", "winsize", 
+  "help", "globals", "skiprtp", "folds" 
+}
 
--- Save undo history
-vim.o.undofile = true
+---------------------------------------------------------------------------
+-- Features
+---------------------------------------------------------------------------
+vim.g.have_nerd_font = true   -- Enable nerd font icons
 
--- Case-insensitive searching UNLESS \C or capital in search
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
--- Keep signcolumn on by default
-vim.o.signcolumn = "yes"
-
--- Decrease update time
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
-
--- Set completeopt to have a better completion experience
-vim.o.completeopt = "menuone,noselect"
-
-vim.o.termguicolors = true
-vim.o.cursorline = true
-vim.o.showtabline = 1
-vim.o.syntax = "enable"
-
-vim.g.have_nerd_font = true
-
--- Session restore
-vim.opt.sessionoptions = "curdir,folds,globals,help,tabpages,terminal,winsize"
-
--- ui
-vim.opt.winborder = "single"
-vim.o.tabstop = 4
+---------------------------------------------------------------------------
+-- Disable unused providers (performance)
+---------------------------------------------------------------------------
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0

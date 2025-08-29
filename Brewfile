@@ -6,13 +6,18 @@ tap "go-task/tap"
 # =============================================================================
 # CLI Tools - General development utilities
 # =============================================================================
-brew "fzf"          # Command-line fuzzy finder
-brew "gh"           # GitHub CLI
-brew "git"          # Version control system
-brew "neovim"       # Text editor
-brew "starship"     # Cross-shell prompt
-brew "tmux"         # Terminal multiplexer
-brew "eza"          # Modern replacement for ls
+brew "fzf"                     # Command-line fuzzy finder
+brew "fd"                      # Better find utility
+brew "rg"                      # Better grep utility
+brew "bat"                     # Better cat
+brew "git"                     # Version control system
+brew "lazygit"                 # Git UI
+brew "gh"                      # GitHub CLI
+brew "neovim"                  # Text editor
+brew "starship"                # Cross-shell prompt
+brew "tmux"                    # Terminal multiplexer
+brew "eza"                     # Modern replacement for ls
+brew "golang-migrate"          # Go database migration tool
 
 # =============================================================================
 # Shell Enhancements

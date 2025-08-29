@@ -1,29 +1,64 @@
+-- Key mappings and shortcuts
+-- Define all custom key bindings and shortcuts
+
 local set = vim.keymap.set
 
--- <Space> as leader
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+---------------------------------------------------------------------------
+-- Leader key
+---------------------------------------------------------------------------
+vim.g.mapleader = " "         -- Space as leader key
+vim.g.maplocalleader = " "    -- Space as local leader key
 
-set("n", "<Leader>s", ":w<CR>", { desc = "Save changes" })
-set("n", "<Leader>e", ":bd<CR>", { desc = "Exit buffer" })
+---------------------------------------------------------------------------
+-- File operations
+---------------------------------------------------------------------------
+set("n", "<Leader>w", ":w<CR>", { desc = "Save file" })
+set("n", "<Leader>q", ":bd<CR>", { desc = "Close buffer" })
+set("n", "<Leader>Q", ":qa<CR>", { desc = "Quit all" })
 
+---------------------------------------------------------------------------
 -- Window navigation
+---------------------------------------------------------------------------
+-- Note: <C-k> is used for window navigation, LSP uses <C-s> for signature help
 set("n", "<C-h>", "<C-w>h", { desc = "Go to left window", remap = true })
 set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", remap = true })
 set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", remap = true })
 set("n", "<C-l>", "<C-w>l", { desc = "Go to right window", remap = true })
 
--- Resize windows
-set("n", "=", [[<cmd>vertical resize +5<cr>]], { desc = "make the window biger vertically" })
-set("n", "-", [[<cmd>vertical resize -5<cr>]], { desc = "make the window smaller vertically" })
-set("n", "+", [[<cmd>horizontal resize +2<cr>]], { desc = "make the window bigger horizontally" })
-set("n", "_", [[<cmd>horizontal resize -2<cr>]], { desc = "make the window smaller horizontally" })
+---------------------------------------------------------------------------
+-- Window resizing (LazyVim style)
+---------------------------------------------------------------------------
+set("n", "<leader><Up>", [[<cmd>resize +2<cr>]], { desc = "Increase window height" })
+set("n", "<leader><Down>", [[<cmd>resize -2<cr>]], { desc = "Decrease window height" })
+set("n", "<leader><Left>", [[<cmd>vertical resize -2<cr>]], { desc = "Decrease window width" })
+set("n", "<leader><Right>", [[<cmd>vertical resize +2<cr>]], { desc = "Increase window width" })
 
--- Quick navigation (Less keystrokes)
-set("n", "H", "5h", { desc = "Move left 5 times" })
-set("n", "J", "5j", { desc = "Move down 5 times" })
-set("n", "K", "5k", { desc = "Move up 5 times" })
-set("n", "L", "5l", { desc = "Move right 5 times" })
+---------------------------------------------------------------------------
+-- Better line navigation (handle wrapped lines)
+---------------------------------------------------------------------------
+set("n", "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
+set("n", "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
 
--- Symbols using aerial.nvim
-set("n", "<Leader>k", "<cmd>AerialToggle<CR>", { desc = "Toggle symbols" })
+---------------------------------------------------------------------------
+-- Better indenting (keep selection)
+---------------------------------------------------------------------------
+set("v", "<", "<gv", { desc = "Indent left" })
+set("v", ">", ">gv", { desc = "Indent right" })
+
+---------------------------------------------------------------------------
+-- Move lines up/down
+---------------------------------------------------------------------------
+set("n", "<A-j>", ":m .+1<CR>==", { desc = "Move line down" })
+set("n", "<A-k>", ":m .-2<CR>==", { desc = "Move line up" })
+set("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move lines down" })
+set("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move lines up" })
+
+---------------------------------------------------------------------------
+-- Utility
+---------------------------------------------------------------------------
+set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
+
+---------------------------------------------------------------------------
+-- Symbols outline (using aerial.nvim)
+---------------------------------------------------------------------------
+set("n", "<Leader>o", "<cmd>AerialToggle<CR>", { desc = "Toggle symbols outline" })

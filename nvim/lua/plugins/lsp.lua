@@ -1,195 +1,199 @@
-local ensure_installed = {
-	"lua_ls",
-	"ts_ls",
-	"angularls",
-	"gopls",
-	"biome",
-	"html",
-	"cssls",
-	"tailwindcss",
-	"jsonls",
-}
+-- LSP, completion, formatting, and snippets configuration
+-- Complete language server setup with modern tooling
 
 return {
+	---------------------------------------------------------------------------
+	-- Mason (LSP servers & external tools manager)
+	---------------------------------------------------------------------------
 	{
-		"neovim/nvim-lspconfig",
-		dependencies = {
-
-			-- completion engine
-			{ "saghen/blink.cmp", version = "1.*", opts_extend = { "sources.default" } },
-			"rafamadriz/friendly-snippets",
-
-			-- auto manage lsp servers
-			"williamboman/mason.nvim",
-			"williamboman/mason-lspconfig.nvim",
-
-			-- Formater
-			"stevearc/conform.nvim",
-
-			-- AI code completion
-			{
-				"olimorris/codecompanion.nvim",
-				dependencies = {
-					"nvim-lua/plenary.nvim",
-					"nvim-treesitter/nvim-treesitter",
-				},
-			},
-			"zbirenbaum/copilot.lua",
-			"fang2hou/blink-copilot",
-		},
-
+		"williamboman/mason.nvim",
+		build = ":MasonUpdate",
 		config = function()
-			vim.api.nvim_create_autocmd("LspAttach", {
-				desc = "LSP actions",
-				callback = function(event)
-					local opts = { buffer = event.buf }
-
-					-- Go To commands
-					-- Go to Definition
-					vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-
-					-- Go to References
-					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-
-					-- Go to Implementation
-					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-
-					-- Go to Type Definition
-					vim.keymap.set("n", "gT", vim.lsp.buf.type_definition, opts)
-
-					-- Go to Declaration
-					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-
-					-- Find all references
-					vim.keymap.set("n", "<leader>fr", vim.lsp.buf.references, opts)
-
-					-- Peek Definition (Alt+F12 in VSCode)
-					-- This requires a floating window implementation
-					-- We'll provide a simple one below
-					vim.keymap.set("n", "<leader>pd", function()
-						-- Open definition in a floating window
-						local params = vim.lsp.util.make_position_params()
-						vim.lsp.buf_request(0, "textDocument/definition", params, function(_, result, _, _)
-							if result and result[1] then
-								vim.lsp.util.preview_location(result[1])
-							end
-						end)
-					end, opts)
-
-					-- Additional useful LSP commands
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-					vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-
-					-- Diagnostic navigation
-					vim.keymap.set("n", "gl", vim.diagnostic.open_float, opts)
-					vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-					vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-				end,
-			})
-
-			local capabilities = require("blink.cmp").get_lsp_capabilities()
-
-			local default_setup = function(server)
-				require("lspconfig")[server].setup({
-					capabilities = capabilities,
-				})
-			end
-
-			-- Copilot
-			require("copilot").setup({
-				suggestion = { enabled = false },
-				panel = { enabled = false },
-			})
-
-			require("mason").setup({})
-			require("mason-lspconfig").setup({
-				ensure_installed = ensure_installed,
-				automatic_installation = true,
-				handlers = {
-					default_setup,
+			require("mason").setup({
+				ui = {
+					border = "rounded",
+					icons = {
+						package_installed = "✓",
+						package_pending = "➜",
+						package_uninstalled = "✗",
+					},
 				},
 			})
+		end,
+	},
 
-			-- Formaters
-			require("conform").setup({
+	{
+		"williamboman/mason-lspconfig.nvim",
+		dependencies = { "williamboman/mason.nvim" },
+		config = function()
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					"lua_ls", -- Lua
+					"ts_ls", -- TypeScript/JavaScript
+					"jsonls", -- JSON
+					"cssls", -- CSS
+					"gopls", -- Go
+					"html", -- HTML
+				},
+				automatic_installation = true,
+			})
+		end,
+	},
+
+	---------------------------------------------------------------------------
+	-- Auto-install external formatters and linters
+	---------------------------------------------------------------------------
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		dependencies = { "williamboman/mason.nvim" },
+		config = function()
+			require("mason-tool-installer").setup({
+				ensure_installed = {
+					-- Lua
+					"stylua",
+					-- Web Development
+					"prettierd",
+					"prettier",
+					-- Go
+					"gofumpt",
+					"goimports",
+				},
+				run_on_start = true,
+				start_delay = 0,
+				debounce_hours = 12,
+			})
+		end,
+	},
+
+	---------------------------------------------------------------------------
+	-- Code formatting (Conform.nvim)
+	---------------------------------------------------------------------------
+	{
+		"stevearc/conform.nvim",
+		event = { "BufWritePre" },
+		cmd = { "ConformInfo" },
+		keys = {
+			{
+				"<leader>F",
+				function()
+					require("conform").format({ async = true, lsp_fallback = true })
+				end,
+				mode = { "n", "v" },
+				desc = "Format buffer / range",
+			},
+		},
+		config = function()
+			local conform = require("conform")
+			local util = require("conform.util")
+
+			conform.setup({
 				formatters_by_ft = {
 					lua = { "stylua" },
-					javascript = { "biome-check" },
-					javascriptreact = { "biome-check" },
-					typescript = { "biome-check" },
-					typescriptreact = { "biome-check" },
-					json = { "biome-check" },
+					javascript = { "prettierd", "prettier", stop_after_first = true },
+					typescript = { "prettierd", "prettier", stop_after_first = true },
+					javascriptreact = { "prettierd", "prettier", stop_after_first = true },
+					typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+					json = { "prettierd", "prettier", stop_after_first = true },
+					css = { "prettierd", "prettier", stop_after_first = true },
+					scss = { "prettierd", "prettier", stop_after_first = true },
+					html = { "prettierd", "prettier", stop_after_first = true },
+					go = { "goimports", "gofumpt" },
 				},
-				--[[ format_on_save = {
-					-- These options will be passed to conform.format()
-					timeout_ms = 500,
-					lsp_format = "fallback",
-				}, ]]
+				format_on_save = function(bufnr)
+					return {
+						timeout_ms = 800,
+						lsp_fallback = true,
+						bufnr = bufnr,
+					}
+				end,
+				notify_on_error = true,
+				log_level = vim.log.levels.ERROR,
 			})
+		end,
+	},
 
-			-- Create explicit formatting command
-			vim.api.nvim_create_user_command("Format", function()
-				require("conform").format({ async = true })
-			end, {})
+	---------------------------------------------------------------------------
+	-- Snippets engine
+	---------------------------------------------------------------------------
+	{
+		"L3MON4D3/LuaSnip",
+		version = "v2.*",
+		build = "make install_jsregexp",
+		dependencies = { "rafamadriz/friendly-snippets" },
+		config = function()
+			require("luasnip.loaders.from_vscode").lazy_load()
+		end,
+	},
 
-			-- AI code completion
-			require("codecompanion").setup({
-				adapters = {
-					copilot = function()
-						return require("codecompanion.adapters").extend("copilot", {
-							schema = {
-								model = {
-									default = "gpt-4.1",
-								},
-							},
-						})
-					end,
-				},
-			})
-
-			-- Blink
+	---------------------------------------------------------------------------
+	-- Modern completion engine (blink.cmp)
+	---------------------------------------------------------------------------
+	{
+		"saghen/blink.cmp",
+		lazy = false,
+		version = "v0.*",
+		dependencies = {
+			"rafamadriz/friendly-snippets",
+		},
+		config = function()
 			require("blink.cmp").setup({
-				keymap = { preset = "default" },
-				appearance = {
-					nerd_font_variant = "mono",
+				keymap = {
+					preset = "default",
+					["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+					["<C-e>"] = { "hide" },
+					["<C-y>"] = { "select_and_accept" },
+					["<C-p>"] = { "select_prev", "fallback" },
+					["<C-n>"] = { "select_next", "fallback" },
+					["<C-u>"] = { "scroll_documentation_up", "fallback" },
+					["<C-d>"] = { "scroll_documentation_down", "fallback" },
 				},
-
+				appearance = {
+					use_nvim_cmp_as_default = true,
+					nerd_font_variant = "mono",
+					kind_icons = {
+						Text = "󰉿",
+						Method = "󰊕",
+						Function = "󰊕",
+						Constructor = "󰒓",
+						Field = "󰜢",
+						Variable = "󰆦",
+						Property = "󰖷",
+						Class = "󱡠",
+						Interface = "󱡠",
+						Struct = "󱡠",
+						Module = "󰅩",
+						Unit = "󰪚",
+						Value = "󰦨",
+						Enum = "󰦨",
+						EnumMember = "󰦨",
+						Keyword = "󰻾",
+						Constant = "󰏿",
+						Snippet = "󱄽",
+						Color = "󰏘",
+						File = "󰈔",
+						Reference = "󰬲",
+						Folder = "󰉋",
+						Event = "󱐋",
+						Operator = "󰪚",
+						TypeParameter = "󰬛",
+					},
+				},
+				sources = {
+					default = { "lsp", "path", "snippets", "buffer" },
+				},
+				cmdline = {
+					sources = { "buffer", "cmdline" },
+				},
 				completion = {
 					accept = {
-						-- experimental auto-brackets support
-						auto_brackets = {
-							enabled = true,
-						},
+						auto_brackets = { enabled = true },
 					},
 					menu = {
 						draw = {
 							treesitter = { "lsp" },
-							components = {
-								kind_icon = {
-									text = function(ctx)
-										-- Check if the completion is from Copilot
-										if ctx.source_name == "copilot" then
-											return "" -- GitHub icon from Nerd Fonts
-										else
-											-- Default behavior for LSP and other sources
-											local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
-											return kind_icon
-										end
-									end,
-									-- (optional) use highlights from mini.icons
-									highlight = function(ctx)
-										local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
-										return hl
-									end,
-								},
-								kind = {
-									-- (optional) use highlights from mini.icons
-									highlight = function(ctx)
-										local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
-										return hl
-									end,
-								},
+							columns = {
+								{ "label", "label_description", gap = 1 },
+								{ "kind_icon", "kind" },
 							},
 						},
 					},
@@ -197,40 +201,266 @@ return {
 						auto_show = true,
 						auto_show_delay_ms = 200,
 					},
-					ghost_text = {
-						enabled = vim.g.ai_cmp,
-					},
+					ghost_text = { enabled = false },
 				},
+				signature = { enabled = true },
+				snippets = {
+					expand = function(snippet)
+						require("luasnip").lsp_expand(snippet)
+					end,
+					active = function(filter)
+						if filter and filter.direction then
+							return require("luasnip").jumpable(filter.direction)
+						end
+						return require("luasnip").in_snippet()
+					end,
+					jump = function(dir)
+						require("luasnip").jump(dir)
+					end,
+				},
+			})
+		end,
+	},
 
-				-- Default list of enabled providers defined so that you can extend it
-				-- elsewhere in your config, without redefining it, due to `opts_extend`
-				sources = {
-					default = { "lsp", "path", "snippets", "buffer", "copilot" },
-					per_filetype = { "codecompanion" },
-					providers = {
-						copilot = {
-							name = "copilot",
-							module = "blink-copilot",
-							score_offset = 100,
-							async = true,
+	---------------------------------------------------------------------------
+	-- JSON Schema store
+	---------------------------------------------------------------------------
+	{
+		"b0o/schemastore.nvim",
+		lazy = true,
+	},
+
+	---------------------------------------------------------------------------
+	-- Core LSP configuration
+	---------------------------------------------------------------------------
+	{
+		"neovim/nvim-lspconfig",
+		dependencies = {
+			"williamboman/mason-lspconfig.nvim",
+			"saghen/blink.cmp",
+			"b0o/schemastore.nvim",
+			"stevearc/conform.nvim",
+			"ibhagwan/fzf-lua",
+		},
+		config = function()
+			local lspconfig = require("lspconfig")
+			local cmp_caps = require("blink.cmp").get_lsp_capabilities()
+
+			local function on_attach(client, bufnr)
+				local fzf = require("fzf-lua")
+				local map = function(mode, lhs, rhs, desc)
+					vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
+				end
+
+				-----------------------------------------------------------------------
+				-- LSP Navigation (using fzf-lua for enhanced UX)
+				-----------------------------------------------------------------------
+				map("n", "gd", fzf.lsp_definitions, "Goto Definition")
+				map("n", "gD", fzf.lsp_declarations, "Goto Declaration")
+				map("n", "gi", fzf.lsp_implementations, "Goto Implementation")
+				map("n", "gt", fzf.lsp_typedefs, "Goto Type Definition")
+				map("n", "gr", fzf.lsp_references, "References")
+
+				-----------------------------------------------------------------------
+				-- Core LSP functionality
+				-----------------------------------------------------------------------
+				map("n", "K", vim.lsp.buf.hover, "Hover Documentation")
+				map("n", "<F2>", vim.lsp.buf.rename, "Rename Symbol")
+				map({ "n", "v" }, "<leader>ca", fzf.lsp_code_actions, "Code Actions")
+
+				-----------------------------------------------------------------------
+				-- Diagnostics
+				-----------------------------------------------------------------------
+				map("n", "<leader>l", vim.diagnostic.open_float, "Show Line Diagnostics")
+				map("n", "<leader>ld", fzf.diagnostics_document, "Document Diagnostics")
+				map("n", "<leader>lw", fzf.diagnostics_workspace, "Workspace Diagnostics")
+				map("n", "[d", function()
+					vim.diagnostic.jump({ count = 1, float = true })
+				end, "Previous Diagnostic")
+				map("n", "]d", function()
+					vim.diagnostic.jump({ count = -1, float = true })
+				end, "Next Diagnostic")
+
+				-----------------------------------------------------------------------
+				-- Symbol navigation
+				-----------------------------------------------------------------------
+				map("n", "<leader>ds", fzf.lsp_document_symbols, "Document Symbols")
+				map("n", "<leader>ws", fzf.lsp_workspace_symbols, "Workspace Symbols")
+				map("n", "<leader>wS", fzf.lsp_live_workspace_symbols, "Live Workspace Symbols")
+
+				-----------------------------------------------------------------------
+				-- LSP Finder - unified view of definitions, references, etc.
+				-----------------------------------------------------------------------
+				map("n", "<leader>lf", fzf.lsp_finder, "LSP Finder (All Locations)")
+
+				-----------------------------------------------------------------------
+				-- Call hierarchy
+				-----------------------------------------------------------------------
+				map("n", "<leader>ci", fzf.lsp_incoming_calls, "Incoming Calls")
+				map("n", "<leader>co", fzf.lsp_outgoing_calls, "Outgoing Calls")
+
+				-----------------------------------------------------------------------
+				-- Signature help (using Ctrl+s to avoid window nav conflict)
+				-----------------------------------------------------------------------
+				map({ "n", "i" }, "<C-s>", vim.lsp.buf.signature_help, "Signature Help")
+				map("n", "<leader>ls", vim.lsp.buf.signature_help, "Code Signatures")
+
+				-----------------------------------------------------------------------
+				-- Inlay hints toggle
+				-----------------------------------------------------------------------
+				if client.supports_method("textDocument/inlayHint") then
+					vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
+					map("n", "<leader>th", function()
+						local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
+						vim.lsp.inlay_hint.enable(not enabled, { bufnr = bufnr })
+					end, "Toggle Inlay Hints")
+				end
+			end
+
+			-----------------------------------------------------------------------
+			-- Language server configurations
+			-----------------------------------------------------------------------
+			local servers = {
+				-- Lua language server
+				lua_ls = {
+					settings = {
+						Lua = {
+							runtime = { version = "LuaJIT" },
+							workspace = {
+								checkThirdParty = false,
+								library = { vim.env.VIMRUNTIME },
+							},
+							completion = { callSnippet = "Replace" },
+							diagnostics = { globals = { "vim" } },
+							hint = { enable = true },
 						},
 					},
 				},
-				cmdline = {
-					enabled = true,
-					sources = {
-						"cmdline",
-						"path",
+
+				-- TypeScript/JavaScript language server
+				ts_ls = {
+					settings = {
+						typescript = {
+							inlayHints = {
+								includeInlayParameterNameHints = "all",
+								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+								includeInlayFunctionParameterTypeHints = true,
+								includeInlayVariableTypeHints = true,
+								includeInlayPropertyDeclarationTypeHints = true,
+								includeInlayFunctionLikeReturnTypeHints = true,
+								includeInlayEnumMemberValueHints = true,
+							},
+						},
+						javascript = {
+							inlayHints = {
+								includeInlayParameterNameHints = "all",
+								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+								includeInlayFunctionParameterTypeHints = true,
+								includeInlayVariableTypeHints = true,
+								includeInlayPropertyDeclarationTypeHints = true,
+								includeInlayFunctionLikeReturnTypeHints = true,
+								includeInlayEnumMemberValueHints = true,
+							},
+						},
 					},
 				},
 
-				-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
-				-- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
-				-- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
-				--
-				-- See the fuzzy documentation for more information
-				fuzzy = { implementation = "prefer_rust_with_warning" },
-				signature = { enabled = true },
+				-- JSON language server with schema support
+				jsonls = {
+					settings = {
+						json = {
+							schemas = (function()
+								local ok, schemastore = pcall(require, "schemastore")
+								return ok and schemastore.json.schemas() or {}
+							end)(),
+							validate = { enable = true },
+						},
+					},
+				},
+
+				-- CSS language server
+				cssls = {
+					settings = {
+						css = {
+							validate = true,
+							lint = { unknownAtRules = "ignore" },
+						},
+					},
+				},
+
+				-- Go language server
+				gopls = {
+					settings = {
+						gopls = {
+							analyses = { unusedparams = true },
+							staticcheck = true,
+							gofumpt = true,
+							hints = {
+								assignVariableTypes = true,
+								compositeLiteralFields = true,
+								compositeLiteralTypes = true,
+								constantValues = true,
+								functionTypeParameters = true,
+								parameterNames = true,
+								rangeVariableTypes = true,
+							},
+						},
+					},
+				},
+
+				-- HTML language server
+				html = {
+					settings = {
+						html = {
+							format = {
+								templating = true,
+								wrapLineLength = 120,
+								wrapAttributes = "auto",
+							},
+							hover = {
+								documentation = true,
+								references = true,
+							},
+						},
+					},
+				},
+			}
+
+			-----------------------------------------------------------------------
+			-- Apply server configurations
+			-----------------------------------------------------------------------
+			for name, cfg in pairs(servers) do
+				cfg.capabilities = cmp_caps
+				cfg.on_attach = on_attach
+				lspconfig[name].setup(cfg)
+			end
+
+			-----------------------------------------------------------------------
+			-- Diagnostics UI configuration
+			-----------------------------------------------------------------------
+			vim.diagnostic.config({
+				virtual_text = {
+					spacing = 4,
+					source = "if_many",
+					prefix = "●",
+				},
+				signs = {
+					text = {
+						[vim.diagnostic.severity.ERROR] = "✘",
+						[vim.diagnostic.severity.WARN] = "▲",
+						[vim.diagnostic.severity.HINT] = "⚑",
+						[vim.diagnostic.severity.INFO] = "»",
+					},
+				},
+				underline = true,
+				update_in_insert = false,
+				severity_sort = true,
+				float = {
+					border = "rounded",
+					source = true,
+					header = "",
+					prefix = "",
+				},
 			})
 		end,
 	},

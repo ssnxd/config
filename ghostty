@@ -1,11 +1,44 @@
-theme = Github-Dark-Default
+# --- Theme ---
+theme = "Github-Dark-Default"
 
-window-padding-y = 5
+# --- Background & Window ---
+background-opacity = 0.8
+# macOS background blur
+background-blur = true
+
+# Window padding
 window-padding-x = 5
-macos-titlebar-style = hidden
+window-padding-y = 5
 
-font-size = 16.0
+# macOS titlebar style
+macos-titlebar-style = "hidden"
+
+# --- Font Configuration ---
+# Using Monaspace variants
 font-family = "Monaspace Argon Var"
 font-family-bold = "Monaspace Neon Var"
 font-family-bold-italic = "Monaspace Neon Var"
 font-family-italic = "Monaspace Radon Var"
+font-size = 16.0
+
+# Monaspace font features
+font-feature = "zero,kern,calt,clig,liga,ss01,ss02,ss03,ss04,ss05,ss06,ss07,ss08,ss09,ss10,ss11,ss12,ss13,ss14,ss15,ss16,ss17,ss18"
+
+# --- Rendering ---
+alpha-blending = "linear-corrected"
+
+# --- Cursor Style ---
+cursor-style = "block"
+cursor-style-blink = false
+cursor-color = "#abb2bf"
+cursor-invert-fg-bg = true
+
+# --- Shell & Command ---
+shell-integration = "zsh"
+shell-integration-features = "no-cursor"
+
+# Keep terminal open after command exits.
+wait-after-command = true
+
+# --- Scrollback ---
+scrollback-limit = 100000

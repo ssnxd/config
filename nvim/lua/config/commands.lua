@@ -1,6 +1,11 @@
--- :Task
--- Set up as task name
--- @Usage :Task task_name
+-- Custom user commands
+-- Define helpful commands for development workflow
+
+---------------------------------------------------------------------------
+-- Task management command
+---------------------------------------------------------------------------
+-- :Task - Set current task name for statusline display
+-- Usage: :Task working on feature X
 vim.g.CURRENT_TASK_NAME = 'No task'
 vim.api.nvim_create_user_command(
   'Task',
@@ -12,20 +17,23 @@ vim.api.nvim_create_user_command(
   { desc = "Update task name", nargs = "*" }
 )
 
--- :UrlOpen
--- Fetch data from url and open in new buffer
--- first check if can parse to json else will fallback to text
--- @Usage :UrlOpen url
+---------------------------------------------------------------------------
+-- URL content fetcher (commented out)
+---------------------------------------------------------------------------
+-- :UrlOpen - Fetch data from URL and open in new buffer
+-- Attempts JSON parsing, falls back to plain text
+-- Usage: :UrlOpen https://api.example.com/data
+-- 
 -- vim.api.nvim_create_user_command(
 --   'UrlOpen',
 --   function(args)
 --     local url = args['args']
---     local handle = io.popen("curl " .. url) -- getting our content using curl
+--     local handle = io.popen("curl " .. url)
 -- 
 --     if handle ~= nil then
 --       local result = handle:read("*a")
 --       handle:close()
---       -- Insert "Hello World" into the new buffer
+--       -- Insert content into new buffer
 --       vim.api.nvim_command("botright vsplit " .. url)
 --       vim.api.nvim_input("<Esc>:r !" .. result .. "<CR>")
 --     else

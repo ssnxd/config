@@ -6,8 +6,8 @@ local set = vim.keymap.set
 ---------------------------------------------------------------------------
 -- Leader key
 ---------------------------------------------------------------------------
-vim.g.mapleader = " "         -- Space as leader key
-vim.g.maplocalleader = " "    -- Space as local leader key
+vim.g.mapleader = " " -- Space as leader key
+vim.g.maplocalleader = " " -- Space as local leader key
 
 ---------------------------------------------------------------------------
 -- File operations

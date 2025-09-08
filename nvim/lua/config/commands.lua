@@ -6,16 +6,12 @@
 ---------------------------------------------------------------------------
 -- :Task - Set current task name for statusline display
 -- Usage: :Task working on feature X
-vim.g.CURRENT_TASK_NAME = 'No task'
-vim.api.nvim_create_user_command(
-  'Task',
-  function(args)
-    if (args['args']) then
-      vim.g.CURRENT_TASK_NAME = '🚀 Working on: [ ' .. args['args'] .. ' ]'
-    end
-  end,
-  { desc = "Update task name", nargs = "*" }
-)
+vim.g.CURRENT_TASK_NAME = "No task"
+vim.api.nvim_create_user_command("Task", function(args)
+	if args["args"] then
+		vim.g.CURRENT_TASK_NAME = "🚀 Working on: [ " .. args["args"] .. " ]"
+	end
+end, { desc = "Update task name", nargs = "*" })
 
 ---------------------------------------------------------------------------
 -- URL content fetcher (commented out)
@@ -23,13 +19,13 @@ vim.api.nvim_create_user_command(
 -- :UrlOpen - Fetch data from URL and open in new buffer
 -- Attempts JSON parsing, falls back to plain text
 -- Usage: :UrlOpen https://api.example.com/data
--- 
+--
 -- vim.api.nvim_create_user_command(
 --   'UrlOpen',
 --   function(args)
 --     local url = args['args']
 --     local handle = io.popen("curl " .. url)
--- 
+--
 --     if handle ~= nil then
 --       local result = handle:read("*a")
 --       handle:close()

@@ -3,25 +3,20 @@
 
 return {
 	---------------------------------------------------------------------------
-	-- Color scheme (alternative themes commented out)
+	-- Color scheme
 	---------------------------------------------------------------------------
-	-- {
-	--   "sainnhe/gruvbox-material",
-	--   priority = 1000,
-	--   config = function()
-	--     vim.o.background = "dark"
-	--     vim.g.gruvbox_material_background = "hard"
-	--     vim.g.gruvbox_material_enable_italic = true
-	--     -- vim.g.gruvbox_material_transparent_background = 1
-	--     vim.g.gruvbox_material_dim_inactive_windows = 1
-	--     vim.cmd.colorscheme("gruvbox-material")
-	--   end,
-	-- },
-
+	{
+		"rose-pine/neovim",
+		name = "rose-pine",
+		config = function()
+			vim.cmd("colorscheme rose-pine")
+		end,
+	},
 	{
 		"projekt0n/github-nvim-theme",
 		name = "github-theme",
 		lazy = false,
+		enabled = false,
 		priority = 1000,
 		config = function()
 			require("github-theme").setup({
@@ -42,21 +37,22 @@ return {
 	},
 
 	---------------------------------------------------------------------------
-	-- Alternative tab bar (commented out)
+	-- Alternative tab bar
 	---------------------------------------------------------------------------
-	-- {
-	--   "nanozuki/tabby.nvim",
-	--   -- event = 'VimEnter', -- if you want lazy load, see below
-	--   dependencies = "nvim-tree/nvim-web-devicons",
-	--   opts = {
-	--     preset = "active_wins_at_tail",
-	--     option = {
-	--       nerdfont = true, -- whether use nerdfont
-	--       lualine_theme = "gruvbox-material", -- lualine theme name
-	--       section_separators = { left = "", right = "" }, -- separators for sections
-	--     },
-	--   },
-	-- },
+	{
+		"nanozuki/tabby.nvim",
+		enabled = false,
+		-- event = 'VimEnter', -- if you want lazy load, see below
+		dependencies = "nvim-tree/nvim-web-devicons",
+		opts = {
+			preset = "active_wins_at_tail",
+			option = {
+				nerdfont = true, -- whether use nerdfont
+				lualine_theme = "gruvbox-material", -- lualine theme name
+				section_separators = { left = "", right = "" }, -- separators for sections
+			},
+		},
+	},
 
 	---------------------------------------------------------------------------
 	-- Statusline

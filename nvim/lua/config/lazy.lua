@@ -20,4 +20,29 @@ vim.opt.rtp:prepend(lazypath)
 ---------------------------------------------------------------------------
 -- Setup plugin manager
 ---------------------------------------------------------------------------
-require("lazy").setup("plugins")
+require("lazy").setup("plugins", {
+	-- defaults = { lazy = true }, -- Disabled to ensure plugins load correctly
+	performance = {
+		cache = {
+			enabled = true,
+		},
+		rtp = {
+			disabled_plugins = {
+				"gzip",
+				"matchit",
+				"matchparen",
+				"netrwPlugin",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+			},
+		},
+	},
+	ui = {
+		border = "rounded",
+	},
+	change_detection = {
+		notify = false, -- Disable change detection notification
+	},
+})

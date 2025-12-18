@@ -1,5 +1,5 @@
 -- LSP, completion, formatting, and snippets configuration
--- Complete language server setup with modern tooling
+-- Modern setup using Neovim 0.11+ native LSP APIs
 
 return {
 	---------------------------------------------------------------------------
@@ -113,19 +113,6 @@ return {
 	},
 
 	---------------------------------------------------------------------------
-	-- Snippets engine
-	---------------------------------------------------------------------------
-	{
-		"L3MON4D3/LuaSnip",
-		version = "v2.*",
-		build = "make install_jsregexp",
-		dependencies = { "rafamadriz/friendly-snippets" },
-		config = function()
-			require("luasnip.loaders.from_vscode").lazy_load()
-		end,
-	},
-
-	---------------------------------------------------------------------------
 	-- Modern completion engine (blink.cmp)
 	---------------------------------------------------------------------------
 	{
@@ -204,19 +191,9 @@ return {
 					ghost_text = { enabled = false },
 				},
 				signature = { enabled = true },
+				-- Use native vim.snippet support
 				snippets = {
-					expand = function(snippet)
-						require("luasnip").lsp_expand(snippet)
-					end,
-					active = function(filter)
-						if filter and filter.direction then
-							return require("luasnip").jumpable(filter.direction)
-						end
-						return require("luasnip").in_snippet()
-					end,
-					jump = function(dir)
-						require("luasnip").jump(dir)
-					end,
+					preset = "default",
 				},
 			})
 		end,
@@ -231,7 +208,7 @@ return {
 	},
 
 	---------------------------------------------------------------------------
-	-- Core LSP configuration
+	-- Core LSP configuration (modern vim.lsp.config API)
 	---------------------------------------------------------------------------
 	{
 		"neovim/nvim-lspconfig",
@@ -243,7 +220,6 @@ return {
 			"ibhagwan/fzf-lua",
 		},
 		config = function()
-			local lspconfig = require("lspconfig")
 			local cmp_caps = require("blink.cmp").get_lsp_capabilities()
 
 			local function on_attach(client, bufnr)
@@ -318,122 +294,129 @@ return {
 			end
 
 			-----------------------------------------------------------------------
-			-- Language server configurations
+			-- Language server configurations (using modern vim.lsp.config API)
 			-----------------------------------------------------------------------
-			local servers = {
-				-- Lua language server
-				lua_ls = {
-					settings = {
-						Lua = {
-							runtime = { version = "LuaJIT" },
-							workspace = {
-								checkThirdParty = false,
-								library = { vim.env.VIMRUNTIME },
-							},
-							completion = { callSnippet = "Replace" },
-							diagnostics = { globals = { "vim" } },
-							hint = { enable = true },
-						},
-					},
-				},
 
-				-- TypeScript/JavaScript language server
-				ts_ls = {
-					settings = {
-						typescript = {
-							inlayHints = {
-								includeInlayParameterNameHints = "all",
-								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-								includeInlayFunctionParameterTypeHints = true,
-								includeInlayVariableTypeHints = true,
-								includeInlayPropertyDeclarationTypeHints = true,
-								includeInlayFunctionLikeReturnTypeHints = true,
-								includeInlayEnumMemberValueHints = true,
-							},
+			-- Lua language server
+			vim.lsp.config("lua_ls", {
+				capabilities = cmp_caps,
+				on_attach = on_attach,
+				settings = {
+					Lua = {
+						runtime = { version = "LuaJIT" },
+						workspace = {
+							checkThirdParty = false,
+							library = { vim.env.VIMRUNTIME },
 						},
-						javascript = {
-							inlayHints = {
-								includeInlayParameterNameHints = "all",
-								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-								includeInlayFunctionParameterTypeHints = true,
-								includeInlayVariableTypeHints = true,
-								includeInlayPropertyDeclarationTypeHints = true,
-								includeInlayFunctionLikeReturnTypeHints = true,
-								includeInlayEnumMemberValueHints = true,
-							},
-						},
+						completion = { callSnippet = "Replace" },
+						diagnostics = { globals = { "vim" } },
+						hint = { enable = true },
 					},
 				},
+			})
 
-				-- JSON language server with schema support
-				jsonls = {
-					settings = {
-						json = {
-							schemas = (function()
-								local ok, schemastore = pcall(require, "schemastore")
-								return ok and schemastore.json.schemas() or {}
-							end)(),
-							validate = { enable = true },
+			-- TypeScript/JavaScript language server
+			vim.lsp.config("ts_ls", {
+				capabilities = cmp_caps,
+				on_attach = on_attach,
+				settings = {
+					typescript = {
+						inlayHints = {
+							includeInlayParameterNameHints = "all",
+							includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+							includeInlayFunctionParameterTypeHints = true,
+							includeInlayVariableTypeHints = true,
+							includeInlayPropertyDeclarationTypeHints = true,
+							includeInlayFunctionLikeReturnTypeHints = true,
+							includeInlayEnumMemberValueHints = true,
+						},
+					},
+					javascript = {
+						inlayHints = {
+							includeInlayParameterNameHints = "all",
+							includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+							includeInlayFunctionParameterTypeHints = true,
+							includeInlayVariableTypeHints = true,
+							includeInlayPropertyDeclarationTypeHints = true,
+							includeInlayFunctionLikeReturnTypeHints = true,
+							includeInlayEnumMemberValueHints = true,
 						},
 					},
 				},
+			})
 
-				-- CSS language server
-				cssls = {
-					settings = {
-						css = {
-							validate = true,
-							lint = { unknownAtRules = "ignore" },
-						},
+			-- JSON language server with schema support
+			vim.lsp.config("jsonls", {
+				capabilities = cmp_caps,
+				on_attach = on_attach,
+				settings = {
+					json = {
+						schemas = (function()
+							local ok, schemastore = pcall(require, "schemastore")
+							return ok and schemastore.json.schemas() or {}
+						end)(),
+						validate = { enable = true },
 					},
 				},
+			})
 
-				-- Go language server
-				gopls = {
-					settings = {
-						gopls = {
-							analyses = { unusedparams = true },
-							staticcheck = true,
-							gofumpt = true,
-							hints = {
-								assignVariableTypes = true,
-								compositeLiteralFields = true,
-								compositeLiteralTypes = true,
-								constantValues = true,
-								functionTypeParameters = true,
-								parameterNames = true,
-								rangeVariableTypes = true,
-							},
-						},
+			-- CSS language server
+			vim.lsp.config("cssls", {
+				capabilities = cmp_caps,
+				on_attach = on_attach,
+				settings = {
+					css = {
+						validate = true,
+						lint = { unknownAtRules = "ignore" },
 					},
 				},
+			})
 
-				-- HTML language server
-				html = {
-					settings = {
-						html = {
-							format = {
-								templating = true,
-								wrapLineLength = 120,
-								wrapAttributes = "auto",
-							},
-							hover = {
-								documentation = true,
-								references = true,
-							},
+			-- Go language server
+			vim.lsp.config("gopls", {
+				capabilities = cmp_caps,
+				on_attach = on_attach,
+				settings = {
+					gopls = {
+						analyses = { unusedparams = true },
+						staticcheck = true,
+						gofumpt = true,
+						hints = {
+							assignVariableTypes = true,
+							compositeLiteralFields = true,
+							compositeLiteralTypes = true,
+							constantValues = true,
+							functionTypeParameters = true,
+							parameterNames = true,
+							rangeVariableTypes = true,
 						},
 					},
 				},
-			}
+			})
+
+			-- HTML language server
+			vim.lsp.config("html", {
+				capabilities = cmp_caps,
+				on_attach = on_attach,
+				settings = {
+					html = {
+						format = {
+							templating = true,
+							wrapLineLength = 120,
+							wrapAttributes = "auto",
+						},
+						hover = {
+							documentation = true,
+							references = true,
+						},
+					},
+				},
+			})
 
 			-----------------------------------------------------------------------
-			-- Apply server configurations
+			-- Enable all configured servers
 			-----------------------------------------------------------------------
-			for name, cfg in pairs(servers) do
-				cfg.capabilities = cmp_caps
-				cfg.on_attach = on_attach
-				lspconfig[name].setup(cfg)
-			end
+			vim.lsp.enable({ "lua_ls", "ts_ls", "jsonls", "cssls", "gopls", "html" })
 
 			-----------------------------------------------------------------------
 			-- Diagnostics UI configuration

@@ -43,7 +43,6 @@ vim.o.mouse = "a" -- Enable mouse in all modes
 vim.o.clipboard = "unnamedplus" -- Use system clipboard
 vim.o.breakindent = true -- Indent wrapped lines
 vim.o.smartindent = true -- Smart autoindenting
-vim.o.wrap = false -- Don't wrap lines
 vim.o.expandtab = true -- Use spaces instead of tabs
 vim.o.tabstop = 2 -- Tab width
 vim.o.shiftwidth = 2 -- Indent width

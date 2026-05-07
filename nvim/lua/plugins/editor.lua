@@ -111,93 +111,114 @@ return {
 	},
 
 	---------------------------------------------------------------------------
-	-- Treesitter (syntax highlighting and text objects)
+	-- Treesitter (parser management)
+	-- Neovim 0.12 handles highlighting natively; this plugin manages parsers
 	---------------------------------------------------------------------------
 	{
 		"nvim-treesitter/nvim-treesitter",
-		dependencies = {
-			"nvim-treesitter/nvim-treesitter-textobjects",
-		},
+		branch = "main",
+		lazy = false,
 		build = ":TSUpdate",
 		config = function()
-			require("nvim-treesitter.configs").setup({
-				-- Languages to auto-install
-				ensure_installed = {
-					"go",
-					"lua",
-					"python",
-					"tsx",
-					"typescript",
-					"javascript",
-					"json",
-					"yaml",
-					"vimdoc",
-					"vim",
+			require("nvim-treesitter").setup({
+				install_dir = vim.fn.stdpath("data") .. "/site",
+			})
+
+			-- Auto-install desired parsers
+			require("nvim-treesitter").install({
+				"go",
+				"lua",
+				"python",
+				"tsx",
+				"typescript",
+				"javascript",
+				"json",
+				"yaml",
+				"vimdoc",
+				"vim",
+				"html",
+			})
+
+			-- Enable treesitter highlighting for all supported filetypes
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function(args)
+					-- Only enable if a parser is available for this filetype
+					if pcall(vim.treesitter.start, args.buf) then
+						-- Treesitter highlighting enabled
+					end
+				end,
+			})
+		end,
+	},
+
+	---------------------------------------------------------------------------
+	-- Treesitter text objects (select, move, swap)
+	---------------------------------------------------------------------------
+	{
+		"nvim-treesitter/nvim-treesitter-textobjects",
+		branch = "main",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		config = function()
+			require("nvim-treesitter-textobjects").setup({
+				select = {
+					lookahead = true,
 				},
-
-				cc = "zig", -- C/C++ compiler for C/C++ files
-
-				auto_install = false, -- Don't auto-install missing parsers
-
-				highlight = { enable = true },
-				indent = { enable = false }, -- Disabled as it can be unreliable
-
-				-- Incremental selection
-				incremental_selection = {
-					enable = true,
-					keymaps = {
-						init_selection = "<c-space>",
-						node_incremental = "<c-space>",
-						scope_incremental = "<c-s>",
-						node_decremental = "<M-space>",
-					},
-				},
-
-				-- Text objects for functions, classes, etc.
-				textobjects = {
-					select = {
-						enable = true,
-						lookahead = true, -- Auto jump forward to textobj
-						keymaps = {
-							["aa"] = "@parameter.outer",
-							["ia"] = "@parameter.inner",
-							["af"] = "@function.outer",
-							["if"] = "@function.inner",
-							["ac"] = "@class.outer",
-							["ic"] = "@class.inner",
-						},
-					},
-					move = {
-						enable = true,
-						set_jumps = true, -- Add jumps to jumplist
-						goto_next_start = {
-							["]m"] = "@function.outer",
-							["]]"] = "@class.outer",
-						},
-						goto_next_end = {
-							["]M"] = "@function.outer",
-							["]["] = "@class.outer",
-						},
-						goto_previous_start = {
-							["[m"] = "@function.outer",
-							["[["] = "@class.outer",
-						},
-						goto_previous_end = {
-							["[M"] = "@function.outer",
-							["[]"] = "@class.outer",
-						},
-					},
-					swap = {
-						enable = true,
-						swap_next = {
-							["<leader>a"] = "@parameter.inner",
-						},
-						swap_previous = {
-							["<leader>A"] = "@parameter.inner",
-						},
-					},
+				move = {
+					set_jumps = true,
 				},
 			})
+
+			-- Text object selection keymaps
+			local select_fn = function(capture, query)
+				return function()
+					require("nvim-treesitter-textobjects.select").select_textobject(capture, query)
+				end
+			end
+
+			vim.keymap.set({ "x", "o" }, "aa", select_fn("@parameter.outer", "textobjects"), { desc = "Select outer parameter" })
+			vim.keymap.set({ "x", "o" }, "ia", select_fn("@parameter.inner", "textobjects"), { desc = "Select inner parameter" })
+			vim.keymap.set({ "x", "o" }, "af", select_fn("@function.outer", "textobjects"), { desc = "Select outer function" })
+			vim.keymap.set({ "x", "o" }, "if", select_fn("@function.inner", "textobjects"), { desc = "Select inner function" })
+			vim.keymap.set({ "x", "o" }, "ac", select_fn("@class.outer", "textobjects"), { desc = "Select outer class" })
+			vim.keymap.set({ "x", "o" }, "ic", select_fn("@class.inner", "textobjects"), { desc = "Select inner class" })
+
+			-- Move keymaps
+			local move = require("nvim-treesitter-textobjects.move")
+
+			vim.keymap.set({ "n", "x", "o" }, "]m", function()
+				move.goto_next_start("@function.outer", "textobjects")
+			end, { desc = "Next function start" })
+			vim.keymap.set({ "n", "x", "o" }, "]]", function()
+				move.goto_next_start("@class.outer", "textobjects")
+			end, { desc = "Next class start" })
+			vim.keymap.set({ "n", "x", "o" }, "]M", function()
+				move.goto_next_end("@function.outer", "textobjects")
+			end, { desc = "Next function end" })
+			vim.keymap.set({ "n", "x", "o" }, "][", function()
+				move.goto_next_end("@class.outer", "textobjects")
+			end, { desc = "Next class end" })
+			vim.keymap.set({ "n", "x", "o" }, "[m", function()
+				move.goto_previous_start("@function.outer", "textobjects")
+			end, { desc = "Previous function start" })
+			vim.keymap.set({ "n", "x", "o" }, "[[", function()
+				move.goto_previous_start("@class.outer", "textobjects")
+			end, { desc = "Previous class start" })
+			vim.keymap.set({ "n", "x", "o" }, "[M", function()
+				move.goto_previous_end("@function.outer", "textobjects")
+			end, { desc = "Previous function end" })
+			vim.keymap.set({ "n", "x", "o" }, "[]", function()
+				move.goto_previous_end("@class.outer", "textobjects")
+			end, { desc = "Previous class end" })
+
+			-- Swap keymaps
+			local swap = require("nvim-treesitter-textobjects.swap")
+
+			vim.keymap.set("n", "<leader>a", function()
+				swap.swap_next("@parameter.inner")
+			end, { desc = "Swap with next parameter" })
+			vim.keymap.set("n", "<leader>A", function()
+				swap.swap_previous("@parameter.inner")
+			end, { desc = "Swap with previous parameter" })
 		end,
 	},
 
@@ -275,14 +296,6 @@ return {
 	},
 
 	---------------------------------------------------------------------------
-	-- Smart commenting
-	---------------------------------------------------------------------------
-	{
-		"numToStr/Comment.nvim",
-		opts = {},
-	},
-
-	---------------------------------------------------------------------------
 	-- LSP progress notifications
 	---------------------------------------------------------------------------
 	{
@@ -298,11 +311,12 @@ return {
 		event = "VeryLazy",
 		opts = {
 			lsp = {
-				-- Override markdown rendering for cmp and other plugins
+				-- Override markdown rendering for LSP hover/signature
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
-					["cmp.entry.get_documentation"] = true,
+					-- Disabled: this is for nvim-cmp, not blink.cmp
+					["cmp.entry.get_documentation"] = false,
 				},
 			},
 			presets = {

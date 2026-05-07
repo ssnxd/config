@@ -14,6 +14,8 @@ brew "git"                     # Version control system
 brew "lazygit"                 # Git UI
 brew "gh"                      # GitHub CLI
 brew "neovim"                  # Text editor
+brew "tree-sitter"             # Parser generator (required by nvim-treesitter)
+brew "tree-sitter-cli"         # CLI tool for nvim-treesitter
 brew "starship"                # Cross-shell prompt
 brew "tmux"                    # Terminal multiplexer
 brew "eza"                     # Modern replacement for ls

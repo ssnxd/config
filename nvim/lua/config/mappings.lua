@@ -57,8 +57,3 @@ set("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move lines up" })
 -- Utility
 ---------------------------------------------------------------------------
 set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
-
----------------------------------------------------------------------------
--- Symbols outline (using aerial.nvim)
----------------------------------------------------------------------------
-set("n", "<Leader>o", "<cmd>AerialToggle<CR>", { desc = "Toggle symbols outline" })

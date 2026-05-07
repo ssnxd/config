@@ -1,5 +1,5 @@
 -- LSP, completion, formatting, and snippets configuration
--- Modern setup using Neovim 0.11+ native LSP APIs
+-- Modern setup using Neovim 0.12+ native LSP APIs
 
 return {
 	---------------------------------------------------------------------------
@@ -29,13 +29,14 @@ return {
 			require("mason-lspconfig").setup({
 				ensure_installed = {
 					"lua_ls", -- Lua
+					"elixirls", -- Elixir
 					"ts_ls", -- TypeScript/JavaScript
 					"jsonls", -- JSON
 					"cssls", -- CSS
 					"gopls", -- Go
 					"html", -- HTML
 				},
-				automatic_installation = true,
+				-- automatic_enable is true by default (replaces removed automatic_installation)
 			})
 		end,
 	},
@@ -76,7 +77,7 @@ return {
 			{
 				"<leader>F",
 				function()
-					require("conform").format({ async = true, lsp_fallback = true })
+					require("conform").format({ async = true, lsp_format = "fallback" })
 				end,
 				mode = { "n", "v" },
 				desc = "Format buffer / range",
@@ -84,7 +85,6 @@ return {
 		},
 		config = function()
 			local conform = require("conform")
-			local util = require("conform.util")
 
 			conform.setup({
 				formatters_by_ft = {
@@ -99,10 +99,14 @@ return {
 					html = { "prettierd", "prettier", stop_after_first = true },
 					go = { "goimports", "gofumpt" },
 				},
+				default_format_opts = {
+					lsp_format = "fallback",
+					timeout_ms = 800,
+				},
 				format_on_save = function(bufnr)
 					return {
 						timeout_ms = 800,
-						lsp_fallback = true,
+						lsp_format = "fallback",
 						bufnr = bufnr,
 					}
 				end,
@@ -118,7 +122,7 @@ return {
 	{
 		"saghen/blink.cmp",
 		lazy = false,
-		version = "v0.*",
+		version = "1.*",
 		dependencies = {
 			"rafamadriz/friendly-snippets",
 		},
@@ -208,7 +212,7 @@ return {
 	},
 
 	---------------------------------------------------------------------------
-	-- Core LSP configuration (modern vim.lsp.config API)
+	-- Core LSP configuration (modern vim.lsp.config + LspAttach API)
 	---------------------------------------------------------------------------
 	{
 		"neovim/nvim-lspconfig",
@@ -222,85 +226,92 @@ return {
 		config = function()
 			local cmp_caps = require("blink.cmp").get_lsp_capabilities()
 
-			local function on_attach(client, bufnr)
-				local fzf = require("fzf-lua")
-				local map = function(mode, lhs, rhs, desc)
-					vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
-				end
+			-----------------------------------------------------------------------
+			-- Global LspAttach autocmd (replaces per-server on_attach)
+			-----------------------------------------------------------------------
+			vim.api.nvim_create_autocmd("LspAttach", {
+				callback = function(args)
+					local client = vim.lsp.get_client_by_id(args.data.client_id)
+					local bufnr = args.buf
+					local fzf = require("fzf-lua")
 
-				-----------------------------------------------------------------------
-				-- LSP Navigation (using fzf-lua for enhanced UX)
-				-----------------------------------------------------------------------
-				map("n", "gd", fzf.lsp_definitions, "Goto Definition")
-				map("n", "gD", fzf.lsp_declarations, "Goto Declaration")
-				map("n", "gi", fzf.lsp_implementations, "Goto Implementation")
-				map("n", "gt", fzf.lsp_typedefs, "Goto Type Definition")
-				map("n", "gr", fzf.lsp_references, "References")
+					local map = function(mode, lhs, rhs, desc)
+						vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
+					end
 
-				-----------------------------------------------------------------------
-				-- Core LSP functionality
-				-----------------------------------------------------------------------
-				map("n", "K", vim.lsp.buf.hover, "Hover Documentation")
-				map("n", "<F2>", vim.lsp.buf.rename, "Rename Symbol")
-				map({ "n", "v" }, "<leader>ca", fzf.lsp_code_actions, "Code Actions")
+					-------------------------------------------------------------------
+					-- LSP Navigation (using fzf-lua for enhanced UX)
+					-------------------------------------------------------------------
+					map("n", "gd", fzf.lsp_definitions, "Goto Definition")
+					map("n", "gD", fzf.lsp_declarations, "Goto Declaration")
+					map("n", "gi", fzf.lsp_implementations, "Goto Implementation")
+					map("n", "gt", fzf.lsp_typedefs, "Goto Type Definition")
+					map("n", "gr", fzf.lsp_references, "References")
 
-				-----------------------------------------------------------------------
-				-- Diagnostics
-				-----------------------------------------------------------------------
-				map("n", "<leader>l", vim.diagnostic.open_float, "Show Line Diagnostics")
-				map("n", "<leader>ld", fzf.diagnostics_document, "Document Diagnostics")
-				map("n", "<leader>lw", fzf.diagnostics_workspace, "Workspace Diagnostics")
-				map("n", "[d", function()
-					vim.diagnostic.jump({ count = 1, float = true })
-				end, "Previous Diagnostic")
-				map("n", "]d", function()
-					vim.diagnostic.jump({ count = -1, float = true })
-				end, "Next Diagnostic")
+					-------------------------------------------------------------------
+					-- Core LSP functionality
+					-------------------------------------------------------------------
+					map("n", "K", vim.lsp.buf.hover, "Hover Documentation")
+					map("n", "<F2>", vim.lsp.buf.rename, "Rename Symbol")
+					map({ "n", "v" }, "<leader>ca", fzf.lsp_code_actions, "Code Actions")
 
-				-----------------------------------------------------------------------
-				-- Symbol navigation
-				-----------------------------------------------------------------------
-				map("n", "<leader>ds", fzf.lsp_document_symbols, "Document Symbols")
-				map("n", "<leader>ws", fzf.lsp_workspace_symbols, "Workspace Symbols")
-				map("n", "<leader>wS", fzf.lsp_live_workspace_symbols, "Live Workspace Symbols")
+					-------------------------------------------------------------------
+					-- Diagnostics
+					-------------------------------------------------------------------
+					map("n", "<leader>l", vim.diagnostic.open_float, "Show Line Diagnostics")
+					map("n", "<leader>ld", fzf.diagnostics_document, "Document Diagnostics")
+					map("n", "<leader>lw", fzf.diagnostics_workspace, "Workspace Diagnostics")
+					map("n", "[d", function()
+						vim.diagnostic.jump({ count = 1, float = true })
+					end, "Previous Diagnostic")
+					map("n", "]d", function()
+						vim.diagnostic.jump({ count = -1, float = true })
+					end, "Next Diagnostic")
 
-				-----------------------------------------------------------------------
-				-- LSP Finder - unified view of definitions, references, etc.
-				-----------------------------------------------------------------------
-				map("n", "<leader>lf", fzf.lsp_finder, "LSP Finder (All Locations)")
+					-------------------------------------------------------------------
+					-- Symbol navigation
+					-------------------------------------------------------------------
+					map("n", "<leader>ds", fzf.lsp_document_symbols, "Document Symbols")
+					map("n", "<leader>ws", fzf.lsp_workspace_symbols, "Workspace Symbols")
+					map("n", "<leader>wS", fzf.lsp_live_workspace_symbols, "Live Workspace Symbols")
 
-				-----------------------------------------------------------------------
-				-- Call hierarchy
-				-----------------------------------------------------------------------
-				map("n", "<leader>ci", fzf.lsp_incoming_calls, "Incoming Calls")
-				map("n", "<leader>co", fzf.lsp_outgoing_calls, "Outgoing Calls")
+					-------------------------------------------------------------------
+					-- LSP Finder - unified view of definitions, references, etc.
+					-------------------------------------------------------------------
+					map("n", "<leader>lf", fzf.lsp_finder, "LSP Finder (All Locations)")
 
-				-----------------------------------------------------------------------
-				-- Signature help (using Ctrl+s to avoid window nav conflict)
-				-----------------------------------------------------------------------
-				map({ "n", "i" }, "<C-s>", vim.lsp.buf.signature_help, "Signature Help")
-				map("n", "<leader>ls", vim.lsp.buf.signature_help, "Code Signatures")
+					-------------------------------------------------------------------
+					-- Call hierarchy
+					-------------------------------------------------------------------
+					map("n", "<leader>ci", fzf.lsp_incoming_calls, "Incoming Calls")
+					map("n", "<leader>co", fzf.lsp_outgoing_calls, "Outgoing Calls")
 
-				-----------------------------------------------------------------------
-				-- Inlay hints toggle
-				-----------------------------------------------------------------------
-				if client.supports_method("textDocument/inlayHint") then
-					vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
-					map("n", "<leader>th", function()
-						local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
-						vim.lsp.inlay_hint.enable(not enabled, { bufnr = bufnr })
-					end, "Toggle Inlay Hints")
-				end
-			end
+					-------------------------------------------------------------------
+					-- Signature help (using Ctrl+s to avoid window nav conflict)
+					-------------------------------------------------------------------
+					map({ "n", "i" }, "<C-s>", vim.lsp.buf.signature_help, "Signature Help")
+					map("n", "<leader>ls", vim.lsp.buf.signature_help, "Code Signatures")
+
+					-------------------------------------------------------------------
+					-- Inlay hints toggle
+					-------------------------------------------------------------------
+					if client and client:supports_method("textDocument/inlayHint") then
+						vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
+						map("n", "<leader>th", function()
+							local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
+							vim.lsp.inlay_hint.enable(not enabled, { bufnr = bufnr })
+						end, "Toggle Inlay Hints")
+					end
+				end,
+			})
 
 			-----------------------------------------------------------------------
-			-- Language server configurations (using modern vim.lsp.config API)
+			-- Language server configurations (using native vim.lsp.config API)
 			-----------------------------------------------------------------------
 
 			-- Lua language server
 			vim.lsp.config("lua_ls", {
 				capabilities = cmp_caps,
-				on_attach = on_attach,
 				settings = {
 					Lua = {
 						runtime = { version = "LuaJIT" },
@@ -318,7 +329,6 @@ return {
 			-- TypeScript/JavaScript language server
 			vim.lsp.config("ts_ls", {
 				capabilities = cmp_caps,
-				on_attach = on_attach,
 				settings = {
 					typescript = {
 						inlayHints = {
@@ -348,7 +358,6 @@ return {
 			-- JSON language server with schema support
 			vim.lsp.config("jsonls", {
 				capabilities = cmp_caps,
-				on_attach = on_attach,
 				settings = {
 					json = {
 						schemas = (function()
@@ -363,7 +372,6 @@ return {
 			-- CSS language server
 			vim.lsp.config("cssls", {
 				capabilities = cmp_caps,
-				on_attach = on_attach,
 				settings = {
 					css = {
 						validate = true,
@@ -375,7 +383,6 @@ return {
 			-- Go language server
 			vim.lsp.config("gopls", {
 				capabilities = cmp_caps,
-				on_attach = on_attach,
 				settings = {
 					gopls = {
 						analyses = { unusedparams = true },
@@ -397,7 +404,6 @@ return {
 			-- HTML language server
 			vim.lsp.config("html", {
 				capabilities = cmp_caps,
-				on_attach = on_attach,
 				settings = {
 					html = {
 						format = {

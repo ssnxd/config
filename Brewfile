@@ -20,6 +20,7 @@ brew "starship"                # Cross-shell prompt
 brew "tmux"                    # Terminal multiplexer
 brew "eza"                     # Modern replacement for ls
 brew "golang-migrate"          # Go database migration tool
+brew "pure"                    # Pure terminal prompt
 
 # =============================================================================
 # Shell Enhancements

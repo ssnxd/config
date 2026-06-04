@@ -51,10 +51,47 @@ return {
 					width = 0.80,
 					row = 0.35,
 					col = 0.50,
-					border = "rounded",
+					border = "single",
+					backdrop = 60,
+					title = " Finder ",
+					title_pos = "center",
 					preview = {
+						border = "single",
+						title = true,
+						title_pos = "center",
 						scrollbar = "float",
+						layout = "flex",
+						flip_columns = 120,
+						winopts = {
+							cursorline = true,
+							number = true,
+							relativenumber = false,
+							signcolumn = "no",
+						},
 					},
+				},
+				hls = {
+					border = "FzfLuaBorder",
+					cursorline = "FzfLuaCursorLine",
+					preview_border = "FzfLuaPreviewBorder",
+					preview_title = "FzfLuaPreviewTitle",
+					title = "FzfLuaTitle",
+				},
+				fzf_colors = {
+					["border"] = { "fg", "FzfLuaBorder" },
+					["bg+"] = { "bg", "FzfLuaCursorLine" },
+					["fg+"] = { "fg", "FzfLuaCursorLine" },
+					["gutter"] = { "bg", "FzfLuaFzfGutter" },
+					["header"] = { "fg", "FzfLuaHeaderText" },
+					["hl"] = { "fg", "FzfLuaFzfMatch" },
+					["hl+"] = { "fg", "FzfLuaFzfMatch" },
+					["info"] = { "fg", "Comment" },
+					["marker"] = { "fg", "FzfLuaFzfMarker" },
+					["pointer"] = { "fg", "FzfLuaFzfPointer" },
+					["prompt"] = { "fg", "FzfLuaFzfPrompt" },
+					["query"] = { "fg", "FzfLuaNormal" },
+					["separator"] = { "fg", "FzfLuaFzfSeparator" },
+					["spinner"] = { "fg", "FzfLuaFzfPrompt" },
 				},
 				keymap = {
 					builtin = {
@@ -175,12 +212,42 @@ return {
 				end
 			end
 
-			vim.keymap.set({ "x", "o" }, "aa", select_fn("@parameter.outer", "textobjects"), { desc = "Select outer parameter" })
-			vim.keymap.set({ "x", "o" }, "ia", select_fn("@parameter.inner", "textobjects"), { desc = "Select inner parameter" })
-			vim.keymap.set({ "x", "o" }, "af", select_fn("@function.outer", "textobjects"), { desc = "Select outer function" })
-			vim.keymap.set({ "x", "o" }, "if", select_fn("@function.inner", "textobjects"), { desc = "Select inner function" })
-			vim.keymap.set({ "x", "o" }, "ac", select_fn("@class.outer", "textobjects"), { desc = "Select outer class" })
-			vim.keymap.set({ "x", "o" }, "ic", select_fn("@class.inner", "textobjects"), { desc = "Select inner class" })
+			vim.keymap.set(
+				{ "x", "o" },
+				"aa",
+				select_fn("@parameter.outer", "textobjects"),
+				{ desc = "Select outer parameter" }
+			)
+			vim.keymap.set(
+				{ "x", "o" },
+				"ia",
+				select_fn("@parameter.inner", "textobjects"),
+				{ desc = "Select inner parameter" }
+			)
+			vim.keymap.set(
+				{ "x", "o" },
+				"af",
+				select_fn("@function.outer", "textobjects"),
+				{ desc = "Select outer function" }
+			)
+			vim.keymap.set(
+				{ "x", "o" },
+				"if",
+				select_fn("@function.inner", "textobjects"),
+				{ desc = "Select inner function" }
+			)
+			vim.keymap.set(
+				{ "x", "o" },
+				"ac",
+				select_fn("@class.outer", "textobjects"),
+				{ desc = "Select outer class" }
+			)
+			vim.keymap.set(
+				{ "x", "o" },
+				"ic",
+				select_fn("@class.inner", "textobjects"),
+				{ desc = "Select inner class" }
+			)
 
 			-- Move keymaps
 			local move = require("nvim-treesitter-textobjects.move")
@@ -231,7 +298,18 @@ return {
 		lazy = false,
 		config = function()
 			require("oil").setup({
-				columns = { "icon", "permissions", "size", "mtime" },
+				columns = {
+					"icon",
+					{ "permissions", highlight = "OilPermissionRead" },
+					{ "size", highlight = "OilSize" },
+					{ "mtime", highlight = "OilMtime" },
+				},
+				win_options = {
+					cursorline = true,
+					signcolumn = "no",
+					foldcolumn = "0",
+					wrap = false,
+				},
 				keymaps = {
 					["g?"] = "actions.show_help",
 					["<CR>"] = "actions.select",
@@ -253,19 +331,42 @@ return {
 				view_options = {
 					show_hidden = true,
 					natural_order = true,
+					case_insensitive = false,
+					sort = {
+						{ "type", "asc" },
+						{ "name", "asc" },
+					},
 					is_always_hidden = function(name, _)
 						return name == ".." or name == ".git"
 					end,
+					highlight_filename = function(_, is_hidden, _, is_link_orphan)
+						if is_link_orphan then
+							return "OilOrphanLink"
+						end
+						if is_hidden then
+							return "OilHidden"
+						end
+					end,
+				},
+				preview_win = {
+					update_on_cursor_moved = true,
+					preview_method = "fast_scratch",
 				},
 				float = {
 					padding = 2,
-					max_width = 90,
-					max_height = 0,
-					border = "rounded",
+					max_width = 0.72,
+					max_height = 0.82,
+					border = "single",
+					get_win_title = function()
+						return " Files "
+					end,
+					preview_split = "right",
 					win_options = {
 						winblend = 0,
+						winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,FloatTitle:FloatTitle,CursorLine:FzfLuaCursorLine",
 					},
 					override = function(conf)
+						conf.title_pos = "center"
 						return conf
 					end,
 				},
@@ -300,7 +401,44 @@ return {
 	---------------------------------------------------------------------------
 	{
 		"j-hui/fidget.nvim",
-		opts = {},
+		opts = {
+			progress = {
+				display = {
+					render_limit = 8,
+					done_icon = "✓",
+					done_style = "FidgetDone",
+					progress_icon = { "dots" },
+					progress_style = "FidgetTask",
+					group_style = "FidgetGroup",
+					icon_style = "FidgetIcon",
+					format_group_name = function(group)
+						return tostring(group)
+					end,
+				},
+			},
+			notification = {
+				override_vim_notify = false,
+				view = {
+					stack_upwards = true,
+					align = "message",
+					group_separator = " ",
+					group_separator_hl = "FidgetMuted",
+					line_margin = 1,
+				},
+				window = {
+					normal_hl = "FidgetNormal",
+					winblend = 0,
+					border = "single",
+					zindex = 45,
+					max_width = 0.34,
+					max_height = 0.35,
+					x_padding = 2,
+					y_padding = 1,
+					align = "bottom",
+					relative = "editor",
+				},
+			},
+		},
 	},
 
 	---------------------------------------------------------------------------
@@ -317,6 +455,37 @@ return {
 					["vim.lsp.util.stylize_markdown"] = true,
 					-- Disabled: this is for nvim-cmp, not blink.cmp
 					["cmp.entry.get_documentation"] = false,
+				},
+			},
+			views = {
+				cmdline_popup = {
+					border = {
+						style = "single",
+						padding = { 0, 1 },
+					},
+				},
+				cmdline_input = {
+					border = {
+						style = "single",
+						padding = { 0, 1 },
+					},
+				},
+				confirm = {
+					border = {
+						style = "single",
+						padding = { 0, 1 },
+					},
+				},
+				popup = {
+					border = {
+						style = "single",
+					},
+				},
+				popupmenu = {
+					border = {
+						style = "single",
+						padding = { 0, 1 },
+					},
 				},
 			},
 			presets = {

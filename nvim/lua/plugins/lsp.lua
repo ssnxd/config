@@ -27,7 +27,7 @@ return {
 		config = function()
 			require("mason").setup({
 				ui = {
-					border = "rounded",
+					border = "single",
 					icons = {
 						package_installed = "✓",
 						package_pending = "➜",
@@ -472,7 +472,7 @@ return {
 				update_in_insert = false,
 				severity_sort = true,
 				float = {
-					border = "rounded",
+					border = "single",
 					source = true,
 					header = "",
 					prefix = "",

@@ -37,7 +37,7 @@ require("lazy").setup("plugins", {
 		},
 	},
 	ui = {
-		border = "rounded",
+		border = "single",
 	},
 	change_detection = {
 		notify = false, -- Disable change detection notification

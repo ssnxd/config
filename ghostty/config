@@ -16,11 +16,11 @@ font-family-italic = "Monaspace Radon Var"
 font-size = 14.0
 
 # Monaspace font features
-font-feature = "zero,kern,calt,clig,liga,ss01,ss02,ss03,ss04,ss05,ss06,ss07,ss08,ss09,ss10,ss11,ss12,ss13,ss14,ss15,ss16,ss17,ss18"
+font-feature = "zero,kern,calt,liga"
 
 # --- Rendering ---
 alpha-blending = "linear-corrected"
-background-opacity = 0.8
+background-opacity = 1.0
 
 # --- Catppuccin Mocha ---
 background = #1e1e2e

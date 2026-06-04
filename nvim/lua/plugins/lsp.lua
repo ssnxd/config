@@ -1,6 +1,22 @@
 -- LSP, completion, formatting, and snippets configuration
 -- Modern setup using Neovim 0.12+ native LSP APIs
 
+local web_filetypes = {
+	css = true,
+	html = true,
+	javascript = true,
+	javascriptreact = true,
+	json = true,
+	jsonc = true,
+	scss = true,
+	typescript = true,
+	typescriptreact = true,
+}
+
+local function web_lsp_format(bufnr)
+	return web_filetypes[vim.bo[bufnr].filetype] and "never" or "fallback"
+end
+
 return {
 	---------------------------------------------------------------------------
 	-- Mason (LSP servers & external tools manager)
@@ -53,6 +69,8 @@ return {
 					-- Lua
 					"stylua",
 					-- Web Development
+					"biome",
+					"oxfmt",
 					"prettierd",
 					"prettier",
 					-- Go
@@ -77,7 +95,7 @@ return {
 			{
 				"<leader>F",
 				function()
-					require("conform").format({ async = true, lsp_format = "fallback" })
+					require("conform").format({ async = true, lsp_format = web_lsp_format(0) })
 				end,
 				mode = { "n", "v" },
 				desc = "Format buffer / range",
@@ -86,17 +104,20 @@ return {
 		config = function()
 			local conform = require("conform")
 
+			local web_formatters = { "biome", "oxfmt", "prettierd", "prettier", stop_after_first = true }
+
 			conform.setup({
 				formatters_by_ft = {
 					lua = { "stylua" },
-					javascript = { "prettierd", "prettier", stop_after_first = true },
-					typescript = { "prettierd", "prettier", stop_after_first = true },
-					javascriptreact = { "prettierd", "prettier", stop_after_first = true },
-					typescriptreact = { "prettierd", "prettier", stop_after_first = true },
-					json = { "prettierd", "prettier", stop_after_first = true },
-					css = { "prettierd", "prettier", stop_after_first = true },
-					scss = { "prettierd", "prettier", stop_after_first = true },
-					html = { "prettierd", "prettier", stop_after_first = true },
+					javascript = web_formatters,
+					typescript = web_formatters,
+					javascriptreact = web_formatters,
+					typescriptreact = web_formatters,
+					json = web_formatters,
+					jsonc = web_formatters,
+					css = web_formatters,
+					scss = web_formatters,
+					html = web_formatters,
 					go = { "goimports", "gofumpt" },
 				},
 				default_format_opts = {
@@ -106,10 +127,16 @@ return {
 				format_on_save = function(bufnr)
 					return {
 						timeout_ms = 800,
-						lsp_format = "fallback",
+						lsp_format = web_lsp_format(bufnr),
 						bufnr = bufnr,
 					}
 				end,
+				formatters = {
+					biome = { require_cwd = true },
+					oxfmt = { require_cwd = true },
+					prettierd = { require_cwd = true },
+					prettier = { require_cwd = true },
+				},
 				notify_on_error = true,
 				log_level = vim.log.levels.ERROR,
 			})

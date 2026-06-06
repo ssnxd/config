@@ -431,7 +431,7 @@ return {
 					border = "single",
 					zindex = 45,
 					max_width = 0.34,
-					max_height = 0.35,
+					max_height = 0,
 					x_padding = 2,
 					y_padding = 1,
 					align = "bottom",

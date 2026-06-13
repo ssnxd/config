@@ -1,0 +1,284 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+	printf 'Usage:\n' >&2
+	printf '  %s              List your dev ports\n' "$(basename "$0")" >&2
+	printf '  %s -v           List all open listening ports\n' "$(basename "$0")" >&2
+	printf '  %s kill <port>  Kill the process(es) using a port\n' "$(basename "$0")" >&2
+	printf '  %s -h|--help    Show help\n' "$(basename "$0")" >&2
+}
+
+die_usage() {
+	printf '%s\n' "$1" >&2
+	usage
+	exit 2
+}
+
+require_lsof() {
+	if ! command -v lsof >/dev/null 2>&1; then
+		printf 'lsof is required but was not found on PATH.\n' >&2
+		printf 'Install it with your system package manager, then try again.\n' >&2
+		exit 1
+	fi
+}
+
+require_port() {
+	local port="$1"
+
+	if [[ -z "$port" || ! "$port" =~ ^[0-9]+$ || "$port" -lt 1 || "$port" -gt 65535 ]]; then
+		die_usage 'Port must be a number between 1 and 65535.'
+	fi
+}
+
+extract_port() {
+	local name="$1"
+
+	if [[ "$name" =~ :([0-9]+)([[:space:]]|\(|$) ]]; then
+		printf '%s\n' "${BASH_REMATCH[1]}"
+		return 0
+	fi
+
+	return 1
+}
+
+path_is_in_dev_scope() {
+	local path="$1"
+	local home_dir="${HOME:-}"
+	local cwd="${PWD:-}"
+
+	case "$path" in
+		"$home_dir"/*|"$home_dir")
+			return 0
+			;;
+		"$cwd"/*|"$cwd")
+			return 0
+			;;
+		/private/tmp/*|/tmp/*)
+			return 0
+			;;
+	esac
+
+	return 1
+}
+
+find_git_root() {
+	local path="$1"
+	local current="$path"
+
+	while [[ -n "$current" && "$current" != "/" ]]; do
+		if [[ -e "$current/.git" ]]; then
+			printf '%s\n' "$current"
+			return 0
+		fi
+		current="$(dirname "$current")"
+	done
+
+	return 1
+}
+
+looks_like_dev_command() {
+	local cmd="$1"
+
+	case "$cmd" in
+		node|npm|pnpm|yarn|bun|deno|python|python3|go|air|uvicorn|gunicorn|vite|next|webpack|esbuild|rollup|ts-node|tsx|ruby|rails|php|java|mvn|gradle|cargo|rustc|dotnet|docker|docker-compose|mongod|postgres|redis-server|http-server|serve|flask|fastapi)
+			return 0
+			;;
+	esac
+
+	return 1
+}
+
+is_dev_port() {
+	local cmd="$1"
+	local cwd="$2"
+
+	if looks_like_dev_command "$cmd"; then
+		return 0
+	fi
+
+	if [[ -n "$cwd" && "$cwd" != "?" ]] && path_is_in_dev_scope "$cwd"; then
+		return 0
+	fi
+
+	if [[ -n "$cwd" && "$cwd" != "?" ]] && find_git_root "$cwd" >/dev/null 2>&1; then
+		return 0
+	fi
+
+	return 1
+}
+
+cwd_for_pid() {
+	local pid="$1"
+	local line
+
+	while IFS= read -r line; do
+		case "$line" in
+			n*)
+				printf '%s\n' "${line#n}"
+				return 0
+				;;
+		esac
+	done < <(lsof -nP -a -p "$pid" -d cwd -Fn 2>/dev/null || true)
+
+	printf '?'
+}
+
+collect_ports() {
+	local proto="$1"
+	local raw_file="$2"
+	local verbose="$3"
+	local -a lsof_args=("${@:4}")
+	local pid=''
+	local cmd=''
+	local name=''
+	local port=''
+	local cwd=''
+	local line=''
+
+	while IFS= read -r line; do
+		case "$line" in
+			p*)
+				pid="${line#p}"
+				cmd=''
+				;;
+			c*)
+				cmd="${line#c}"
+				;;
+			n*)
+				name="${line#n}"
+				if port=$(extract_port "$name"); then
+					cwd=$(cwd_for_pid "$pid")
+					if [[ "$verbose" != 'true' ]] && ! is_dev_port "$cmd" "$cwd"; then
+						continue
+					fi
+					printf '%s\t%s\t%s\t%s\t%s\n' "$proto" "$port" "$pid" "${cmd:-?}" "$cwd" >>"$raw_file"
+				fi
+				;;
+		esac
+	done < <(lsof -nP "${lsof_args[@]}" -F pcn 2>/dev/null || true)
+}
+
+list_ports() {
+	local verbose="$1"
+	local raw_file
+	local unique_file
+	local current_user
+
+	raw_file=$(mktemp "${TMPDIR:-/tmp}/port-list.XXXXXX")
+	unique_file=$(mktemp "${TMPDIR:-/tmp}/port-uniq.XXXXXX")
+	current_user="${SUDO_USER:-${USER:-$(id -un)}}"
+
+	trap "rm -f '$raw_file' '$unique_file'" EXIT INT TERM
+
+	if [[ "$verbose" == 'true' ]]; then
+		collect_ports tcp "$raw_file" 'true' -a -iTCP -sTCP:LISTEN
+		collect_ports udp "$raw_file" 'true' -a -iUDP
+	else
+		collect_ports tcp "$raw_file" 'false' -a -u "$current_user" -iTCP -sTCP:LISTEN
+		collect_ports udp "$raw_file" 'false' -a -u "$current_user" -iUDP
+	fi
+
+	if [[ ! -s "$raw_file" ]]; then
+		printf 'No open ports found.\n'
+		return 0
+	fi
+
+	sort -t "$(printf '\t')" -k1,1 -k2,2n -k3,3n "$raw_file" |
+	awk -F '\t' 'BEGIN { OFS = "\t" } {
+		key = $1 FS $2 FS $3
+		if (seen[key]++) next
+		print
+	}' >"$unique_file"
+
+	if [[ ! -s "$unique_file" ]]; then
+		printf 'No open ports found.\n'
+		return 0
+	fi
+
+	printf '%-4s %-6s %-8s %-20s %s\n' 'ID' 'PROTO' 'PORT' 'PROCESS' 'CWD'
+	awk -F '\t' '{
+		printf "%-4d %-6s %-8s %-20s %s\n", NR, $1, $2, $4 "(" $3 ")", $5
+	}' "$unique_file"
+}
+
+kill_port() {
+	local port="$1"
+	local pids=''
+	local killed=''
+
+	require_port "$port"
+
+	pids="$(
+		{
+			lsof -nP -t -iTCP:"$port" -sTCP:LISTEN 2>/dev/null || true
+			lsof -nP -t -iUDP:"$port" 2>/dev/null || true
+		} | sort -u
+	)"
+
+	if [[ -z "$pids" ]]; then
+		printf 'No process found for port %s.\n' "$port" >&2
+		exit 1
+	fi
+
+	while IFS= read -r pid; do
+		[[ -n "$pid" ]] || continue
+		kill "$pid"
+		killed="${killed:+$killed }$pid"
+	done <<EOF
+$pids
+EOF
+
+	printf 'Killed port %s (pids %s).\n' "$port" "$killed"
+}
+
+main() {
+	local verbose='false'
+
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+			-v|--verbose)
+				verbose='true'
+				shift
+				;;
+			-h|--help)
+				usage
+				exit 0
+				;;
+			kill)
+				break
+				;;
+			-*)
+				die_usage "Unknown option: $1"
+				;;
+			*)
+				break
+				;;
+		esac
+	done
+
+	case "${1:-}" in
+		kill)
+			if [[ $# -ne 2 ]]; then
+				die_usage 'kill requires exactly one port number.'
+			fi
+			require_lsof
+			kill_port "$2"
+			;;
+		'')
+			require_lsof
+			list_ports "$verbose"
+			;;
+		*)
+			if [[ $# -eq 1 ]]; then
+				require_lsof
+				list_ports "$verbose"
+			else
+				die_usage "Unknown command: $1"
+			fi
+			;;
+	esac
+}
+
+main "$@"

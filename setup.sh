@@ -221,6 +221,33 @@ auto_reload() {
 }
 
 # -----------------------------------------------------------------------------
+# Step 5: Check Script Accessibility
+# -----------------------------------------------------------------------------
+
+check_scripts_path() {
+    local scripts_dir="$SCRIPT_DIR/scripts"
+    local tws_path=''
+    local port_path=''
+
+    if [[ ! -d "$scripts_dir" ]]; then
+        warn "Scripts directory not found at $scripts_dir; skipping PATH check"
+        return
+    fi
+
+    tws_path="$(command -v tws 2>/dev/null || true)"
+    port_path="$(command -v port 2>/dev/null || true)"
+
+    if [[ "$tws_path" == "$scripts_dir/tws" && "$port_path" == "$scripts_dir/port" ]]; then
+        success "Scripts are available on PATH"
+        return
+    fi
+
+    warn "Your scripts are not available on PATH."
+    warn "Add this line to your shell profile (for example ~/.zshrc or ~/.bashrc):"
+    printf 'export PATH="%s:$PATH"\n' "$scripts_dir"
+}
+
+# -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
 
@@ -240,6 +267,8 @@ main() {
     reload_tmux
     echo ""
     auto_reload
+    echo ""
+    check_scripts_path
     echo ""
 
     success "Setup complete!"

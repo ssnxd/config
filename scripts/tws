@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+	printf 'Usage:\n' >&2
+	printf '  %s                 Open or create the ssnxd session\n' "$(basename "$0")" >&2
+	printf '  %s <session-name>  Open or create a named session\n' "$(basename "$0")" >&2
+	printf '  %s -p <panes>      Create a new window in the current session\n' "$(basename "$0")" >&2
+	printf '  %s -p <panes> -c <command> [args...]\n' "$(basename "$0")" >&2
+	printf '  %s -l              List running sessions\n' "$(basename "$0")" >&2
+}
+
+die_usage() {
+	printf '%s\n' "$1" >&2
+	usage
+	exit 2
+}
+
+require_tmux() {
+	if ! command -v tmux >/dev/null 2>&1; then
+		printf 'tmux is not installed or not available on PATH.\n' >&2
+		exit 1
+	fi
+}
+
+require_positive_integer() {
+	local value="$1"
+	local name="$2"
+
+	if [[ -z "$value" || ! "$value" =~ ^[1-9][0-9]*$ ]]; then
+		die_usage "$name must be a positive integer."
+	fi
+}
+
+require_session_name() {
+	local session_name="$1"
+
+	if [[ -z "$session_name" ]]; then
+		die_usage 'Session name cannot be empty.'
+	fi
+	if [[ "$session_name" == -* ]]; then
+		die_usage 'Session name cannot start with "-".'
+	fi
+	# tmux targets use ":" to separate sessions, windows, and panes. Rejecting it
+	# keeps user-supplied session names unambiguous in every command below.
+	if [[ "$session_name" == *:* ]]; then
+		die_usage 'Session name cannot contain ":".'
+	fi
+}
+
+open_session() {
+	local session_name="$1"
+	local start_dir="$2"
+
+	require_session_name "$session_name"
+
+	if tmux has-session -t "=${session_name}" 2>/dev/null; then
+		if [[ -n "${TMUX:-}" ]]; then
+			tmux switch-client -t "=${session_name}"
+		else
+			tmux attach-session -t "=${session_name}"
+		fi
+		return
+	fi
+
+	if [[ -n "${TMUX:-}" ]]; then
+		tmux new-session -d -s "$session_name" -c "$start_dir"
+		tmux switch-client -t "=${session_name}"
+	else
+		tmux new-session -s "$session_name" -c "$start_dir"
+	fi
+}
+
+create_window_with_panes() {
+	local pane_count="$1"
+	local start_dir="$2"
+	local command_text="$3"
+	local target_window
+
+	require_positive_integer "$pane_count" 'Pane count'
+
+	if [[ -z "${TMUX:-}" ]]; then
+		printf 'tws -p must be run inside a tmux session.\n' >&2
+		exit 2
+	fi
+
+	# Let tmux create the first pane, then split additional panes into the same
+	# window. The target returned by tmux is stable even if hooks rename windows.
+	target_window=$(tmux new-window -P -F '#S:#I' -c "$start_dir")
+
+	for (( i = 1; i < pane_count; i++ )); do
+		tmux split-window -t "$target_window" -c "$start_dir"
+		tmux select-layout -t "$target_window" tiled >/dev/null
+	done
+
+	if [[ -n "$command_text" ]]; then
+		tmux list-panes -t "$target_window" -F '#{pane_id}' |
+		while IFS= read -r pane_id; do
+			tmux send-keys -t "$pane_id" -l -- "$command_text"
+			tmux send-keys -t "$pane_id" C-m
+		done
+	fi
+
+	tmux select-layout -t "$target_window" tiled >/dev/null
+}
+
+list_sessions() {
+	tmux list-sessions -F '#S' 2>/dev/null || true
+}
+
+main() {
+	local list_only='false'
+	local pane_count=''
+	local command_text=''
+	local start_dir="$PWD"
+
+	while getopts ':lp:c:h' opt; do
+		case "$opt" in
+			l)
+				list_only='true'
+				;;
+			p)
+				pane_count="$OPTARG"
+				;;
+			c)
+				command_text=$(printf '%q ' "$OPTARG" "${@:OPTIND}")
+				command_text=${command_text% }
+				# The command belongs to tmux panes, not to tws. Consume the rest
+				# of argv so commands like `tws -p 2 -c echo -n hi` stay intact.
+				OPTIND=$(($# + 1))
+				;;
+			h)
+				usage
+				exit 0
+				;;
+			:)
+				die_usage "Missing argument for -$OPTARG."
+				;;
+			\?)
+				die_usage "Unknown option: -$OPTARG."
+				;;
+		esac
+	done
+
+	shift $((OPTIND - 1))
+
+	require_tmux
+
+	if [[ "$list_only" == 'true' ]]; then
+		if [[ -n "$pane_count" || -n "$command_text" || $# -gt 0 ]]; then
+			die_usage '-l cannot be combined with sessions, -p, or -c.'
+		fi
+		list_sessions
+		return
+	fi
+
+	if [[ -n "$pane_count" ]]; then
+		if (( $# > 0 )); then
+			die_usage '-p cannot be combined with a session name.'
+		fi
+		create_window_with_panes "$pane_count" "$start_dir" "$command_text"
+		return
+	fi
+
+	if [[ -n "$command_text" ]]; then
+		die_usage '-c requires -p.'
+	fi
+
+	if (( $# > 1 )); then
+		die_usage 'Only one session name is allowed.'
+	fi
+
+	open_session "${1:-ssnxd}" "$start_dir"
+}
+
+main "$@"

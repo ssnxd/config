@@ -174,6 +174,8 @@ return {
 				"vimdoc",
 				"vim",
 				"html",
+				"markdown",
+				"markdown_inline",
 			})
 
 			-- Enable treesitter highlighting for all supported filetypes

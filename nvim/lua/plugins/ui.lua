@@ -169,6 +169,17 @@ return {
 		end,
 	},
 	---------------------------------------------------------------------------
+	-- Markdown rendering
+	---------------------------------------------------------------------------
+	{
+		"OXY2DEV/markview.nvim",
+		-- Do not lazy-load: the plugin is already lazy-loaded internally and
+		-- must load after the colorscheme for correct highlight groups.
+		lazy = false,
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+	},
+
+	---------------------------------------------------------------------------
 	-- Statusline
 	---------------------------------------------------------------------------
 	{

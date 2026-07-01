@@ -160,6 +160,12 @@ create_symlinks() {
 
     # Tmux
     create_symlink "$SCRIPT_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
+
+    # pgcli
+    create_symlink "$SCRIPT_DIR/pgcli/config" "$HOME/.config/pgcli/config"
+
+    # pspg (pager theme used by pgcli)
+    create_symlink "$SCRIPT_DIR/pgcli/pspg_theme_catppuccin" "$HOME/.pspg_theme_catppuccin"
 }
 
 # -----------------------------------------------------------------------------

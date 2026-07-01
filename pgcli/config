@@ -1,0 +1,90 @@
+# --- pgcli Configuration ---
+# Only overrides the defaults we care about; pgcli merges this with its
+# built-in defaults, so unset keys keep their stock values.
+
+[main]
+
+# Enable vi key bindings by default (toggle at runtime with F4).
+vi = True
+
+# Base Pygments style for SQL syntax highlighting. We use a dark base and
+# then override individual tokens below to match Catppuccin Mocha.
+syntax_style = native
+
+# Multi-line queries; execute with Alt+Enter in safe mode.
+multi_line = True
+multi_line_mode = psql
+
+# --- Learning-oriented guardrails & helpers ---
+# keyword_casing / timing / destructive_warning below match pgcli's current
+# defaults; pinned here so they're explicit and survive future default changes.
+
+# Auto-uppercase SQL keywords as you complete them — builds a feel for
+# conventional SQL style without thinking about it.
+keyword_casing = auto
+
+# Show how long each query took (great for building performance intuition).
+timing = True
+
+# Log every query to ~/.config/pgcli/log so you can review/replay what you did.
+log_file = default
+
+# Warn before statements that can harm data. "unconditional_update" also
+# catches UPDATE/DELETE with no WHERE clause — a useful guardrail while learning.
+destructive_warning = drop, shutdown, delete, truncate, alter, update, unconditional_update
+
+# Nicer scrolling table pager with frozen headers/columns (brew "pspg").
+# Uses the Catppuccin Mocha custom theme in ~/.pspg_theme_catppuccin.
+pager = pspg --custom-style=catppuccin --rr=2
+
+# --- Catppuccin Mocha ---
+# Palette:
+#   base #1e1e2e  text #cdd6f4  subtext0 #a6adc8
+#   surface0 #313244  surface1 #45475a  surface2 #585b70  overlay0 #6c7086
+#   blue #89b4fa  lavender #b4befe  sapphire #74c7ec  teal #94e2d5
+#   green #a6e3a1  yellow #f9e2af  peach #fab387  maroon #eba0ac
+#   red #f38ba8  mauve #cba6f7  pink #f5c2e7  flamingo #f2cdcd
+[colors]
+
+# Completion menu
+completion-menu.completion.current = 'bg:#89b4fa #1e1e2e'
+completion-menu.completion = 'bg:#313244 #cdd6f4'
+completion-menu.meta.completion.current = 'bg:#74c7ec #1e1e2e'
+completion-menu.meta.completion = 'bg:#45475a #a6adc8'
+completion-menu.multi-column-meta = 'bg:#45475a #cdd6f4'
+
+# Scrollbar (completion menu)
+scrollbar.arrow = 'bg:#1e1e2e'
+scrollbar.background = 'bg:#313244'
+scrollbar.button = 'bg:#585b70'
+
+# Selection / search
+selected = 'bg:#585b70 #cdd6f4'
+search = 'bg:#f9e2af #1e1e2e'
+search.current = 'bg:#a6e3a1 #1e1e2e'
+
+# Bottom toolbar
+bottom-toolbar = 'bg:#313244 #cdd6f4'
+bottom-toolbar.off = 'bg:#313244 #6c7086'
+bottom-toolbar.on = 'bg:#313244 #a6e3a1'
+bottom-toolbar.transaction.valid = 'bg:#313244 #a6e3a1'
+bottom-toolbar.transaction.failed = 'bg:#313244 #f38ba8'
+
+# Query result output (cli_helpers)
+output.header = 'bold #89b4fa'
+output.odd-row =
+output.even-row =
+output.null = '#6c7086'
+
+# SQL syntax highlighting (Pygments tokens)
+keyword = 'bold #cba6f7'
+name = '#cdd6f4'
+name.builtin = '#89b4fa'
+name.function = '#89b4fa'
+literal.string = '#a6e3a1'
+literal.string.single = '#a6e3a1'
+literal.number = '#fab387'
+operator = '#94e2d5'
+punctuation = '#a6adc8'
+comment = 'italic #6c7086'
+comment.single = 'italic #6c7086'

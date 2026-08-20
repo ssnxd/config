@@ -16,16 +16,24 @@ brew "eza"                     # Modern replacement for ls
 brew "pure"                    # Pure terminal prompt
 brew "pgcli"                   # Better pg interface
 brew "pspg"                    # Table pager for pgcli/psql
+brew "jq"                      # JSON processor
+brew "git-delta"               # Better git diff pager
+brew "yazi"                    # Terminal file manager
 
 # =============================================================================
 # Shell Enhancements
 # =============================================================================
-brew "zsh-autosuggestions"  # Fish-like autosuggestions for zsh
+brew "zsh-autosuggestions"     # Fish-like autosuggestions for zsh
+brew "zsh-syntax-highlighting" # Command syntax highlighting for zsh
+brew "zoxide"                  # Smarter cd that learns your paths
+brew "atuin"                   # Shell history with fuzzy search
+brew "direnv"                  # Per-project environment variables
 
 # =============================================================================
 # Programming Language Support
 # =============================================================================
-brew "pyenv"        # Python version management
+brew "uv"                      # Python package and version manager
+brew "mise"                    # Runtime version manager (node, go, python)
 
 # =============================================================================
 # Applications (Casks)

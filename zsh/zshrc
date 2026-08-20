@@ -1,0 +1,57 @@
+# --- Environment ---
+export EDITOR=nvim
+export XDG_CONFIG_HOME="$HOME/.config"
+
+# Java / Android
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools"
+
+# PATH
+export LOCAL_BIN="$HOME/.local/bin"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$LOCAL_BIN:$HOME/go/bin:$BUN_INSTALL/bin:$HOME/code/config/scripts:$PATH"
+
+# --- History ---
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt share_history hist_ignore_dups hist_ignore_space hist_reduce_blanks
+
+# --- Completion ---
+autoload -Uz compinit
+compinit -C
+# Compile the completion dump once a day; zsh loads the .zwc faster
+if [[ ! -f "$HOME/.zcompdump.zwc" || "$HOME/.zcompdump" -nt "$HOME/.zcompdump.zwc" ]]; then
+  zcompile "$HOME/.zcompdump"
+fi
+[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
+
+# --- Aliases ---
+alias ls='eza'
+alias ll='eza -lh'
+alias la='eza -a'
+alias lla='eza -lah'
+alias lt='eza --tree --level=2'
+alias tree='eza --tree'
+alias cc='claude --dangerously-skip-permissions'
+
+# --- Prompt ---
+autoload -U promptinit; promptinit
+prompt pure
+
+# --- Tools ---
+HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+source <(fzf --zsh)
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+command -v atuin  >/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
+command -v direnv >/dev/null && eval "$(direnv hook zsh)"
+command -v wt     >/dev/null && eval "$(command wt config shell init zsh)"
+
+# --- Local overrides (secrets, work paths; not in git) ---
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
+
+# --- Plugins (keep last) ---
+source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && \
+  source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"

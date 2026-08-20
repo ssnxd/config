@@ -56,12 +56,21 @@ cursor-style-blink = false
 shell-integration = "zsh"
 shell-integration-features = "no-cursor"
 
-# Compatibility
-term = "xterm-256color"
+# Use Ghostty's own terminfo (tmux 3.3+ understands it)
+term = "xterm-ghostty"
+
+# --- Clipboard ---
+clipboard-read = allow
+clipboard-write = allow
+clipboard-paste-protection = false
+
+# --- Keybinds ---
+# Newline in Claude Code and other TUIs
+keybind = shift+enter=text:\n
 
 # Keep terminal open after command exits.
 wait-after-command = false
 quit-after-last-window-closed = true
 
-# --- Scrollback ---
-scrollback-limit = 100000
+# --- Scrollback (bytes, not lines) ---
+scrollback-limit-bytes = 20000000

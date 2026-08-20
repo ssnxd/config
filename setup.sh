@@ -161,6 +161,9 @@ create_symlinks() {
     # Tmux
     create_symlink "$SCRIPT_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
+    # Zsh
+    create_symlink "$SCRIPT_DIR/zsh/zshrc" "$HOME/.zshrc"
+
     # pgcli
     create_symlink "$SCRIPT_DIR/pgcli/config" "$HOME/.config/pgcli/config"
 

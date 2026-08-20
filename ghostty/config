@@ -1,4 +1,5 @@
 # --- Ghostty Configuration ---
+auto-update-channel = tip
 
 # Window padding
 window-padding-x = 2

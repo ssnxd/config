@@ -1,0 +1,6 @@
+# Accent colour per tmux session: <session name> = <colour>
+# Colour is a Catppuccin name (mauve, green, peach, blue, red, teal, yellow, pink)
+# or a hex value like #cba6f7. Sessions not listed here get a colour from a hash
+# of their name. Apply changes with: prefix r
+miivo = mauve
+pandp = green

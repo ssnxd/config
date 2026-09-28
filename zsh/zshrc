@@ -18,6 +18,11 @@ HISTSIZE=50000
 SAVEHIST=50000
 setopt share_history hist_ignore_dups hist_ignore_space hist_reduce_blanks
 
+# --- Homebrew ---
+# /etc/paths.d/homebrew puts brew on PATH, but not its completions/prompts on fpath.
+HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" $fpath)
+
 # --- Completion ---
 autoload -Uz compinit
 compinit -C
@@ -41,7 +46,6 @@ autoload -U promptinit; promptinit
 prompt pure
 
 # --- Tools ---
-HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
 source <(fzf --zsh)
 command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
 command -v atuin  >/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
@@ -55,3 +59,17 @@ command -v wt     >/dev/null && eval "$(command wt config shell init zsh)"
 source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 [ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && \
   source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# Vite+ bin (https://viteplus.dev)
+. "$HOME/.vite-plus/env"
+
+# pnpm
+export PNPM_HOME="/Users/miivo/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
+
+# bun completions
+[ -s "/Users/miivo/.bun/_bun" ] && source "/Users/miivo/.bun/_bun"

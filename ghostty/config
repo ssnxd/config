@@ -9,15 +9,50 @@ window-padding-y = 2
 macos-titlebar-style = "hidden"
 
 # --- Font Configuration ---
-# Using Monaspace variants
-font-family = "Monaspace Argon Var"
-font-family-bold = "Monaspace Neon Var"
-font-family-bold-italic = "Monaspace Neon Var"
-font-family-italic = "Monaspace Radon Var"
+# Monaspace superfamily (Nerd Font patched statics, v1.400).
+# Installed family names are "Monaspace <Variant> NF" -- NOT "... Var".
+# Swap the four lines below to change variant: Neon (neo-grotesque),
+# Argon (humanist), Xenon (slab serif), Krypton (mechanical).
+font-family = "Monaspace Neon NF"
+font-family-bold = "Monaspace Neon NF"
+# Radon is the handwriting cut -- italic comments read as margin notes.
+font-family-italic = "Monaspace Radon NF"
+font-family-bold-italic = "Monaspace Radon NF"
 font-size = 14.0
 
-# Monaspace font features
-font-feature = "zero,kern,calt,liga"
+# Texture healing: rebalances tight/loose pairs (mm, il, ff). This is the
+# headline Monaspace feature and it lives entirely in calt.
+font-feature = "calt"
+font-feature = "liga"
+
+# Monaspace gates its coding ligatures behind stylistic sets -- calt+liga
+# alone gives you NONE of them. Comment a line out to drop that group.
+# NB: Ghostty does not strip trailing "#" comments from a value, so these
+# annotations have to sit on their own lines or the feature is silently
+# parsed as part of the string and dropped.
+#   ss01 = equals ligatures   == === =/=
+#   ss02 = comparisons        != >= <=
+#   ss03 = arrows             -> <- -->
+#   ss05 = F#-style shapes    |> <|
+#   ss09 = double arrows      => <=> ==>
+font-feature = "ss01"
+font-feature = "ss02"
+font-feature = "ss03"
+font-feature = "ss05"
+font-feature = "ss09"
+# Off by default -- uncomment to taste:
+#   ss04 = HTML tags  </ />      ss06 = Markdown strings
+#   ss07 = centered colon        ss08 = centered period
+#   ss10 = other tags
+# font-feature = "ss04"
+# font-feature = "ss06"
+# font-feature = "ss07"
+# font-feature = "ss08"
+# font-feature = "ss10"
+
+# Zero style. Default is a dotted zero; cv01=2 is the classic slash.
+# 1=plain(!) 2=slashed 3=cut 4=open-cut
+font-feature = "cv01=2"
 
 # --- Rendering ---
 alpha-blending = "linear-corrected"
@@ -73,4 +108,4 @@ wait-after-command = false
 quit-after-last-window-closed = true
 
 # --- Scrollback (bytes, not lines) ---
-scrollback-limit-bytes = 20000000
+# scrollback-limit-bytes = 20000000

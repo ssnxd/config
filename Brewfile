@@ -19,6 +19,7 @@ brew "pspg"                    # Table pager for pgcli/psql
 brew "jq"                      # JSON processor
 brew "git-delta"               # Better git diff pager
 brew "yazi"                    # Terminal file manager
+brew "btop"                    # Resource monitor
 
 # =============================================================================
 # Shell Enhancements

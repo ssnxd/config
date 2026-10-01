@@ -1,0 +1,24 @@
+# Skills installed by ./setup.sh --setup-agent with `npx skills add`.
+# Format: <source> <skill>. One skill per line.
+# Motion (motion-ai) and SEO (claude-seo) use their own installers. See setup.sh.
+
+github/gh-stack                               gh-stack
+vercel-labs/skills                            find-skills
+jakubkrehel/skills                            better-ui
+emilkowalski/skills                           emil-design-eng
+
+cloudflare/skills                             agents-sdk
+cloudflare/skills                             cloudflare
+cloudflare/skills                             cloudflare-email-service
+cloudflare/skills                             cloudflare-one
+cloudflare/skills                             cloudflare-one-migrations
+cloudflare/skills                             durable-objects
+cloudflare/skills                             nextjs-on-cloudflare
+cloudflare/skills                             sandbox-migrate-to-next
+cloudflare/skills                             sandbox-next
+cloudflare/skills                             sandbox-stable
+cloudflare/skills                             turnstile-spin
+cloudflare/skills                             web-perf
+cloudflare/skills                             workers-best-practices
+cloudflare/skills                             wrangler
+

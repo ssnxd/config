@@ -8,6 +8,7 @@
 #   ./setup.sh                      # Default setup (no deps install)
 #   ./setup.sh --install-deps       # Also install Homebrew dependencies
 #   ./setup.sh --reload-tmux        # Kill and restart tmux server
+#   ./setup.sh --setup-agent        # Also link AGENTS.md and merge Claude settings
 #   ./setup.sh --help               # Show help
 #
 
@@ -22,6 +23,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Default values
 INSTALL_DEPS=false
 RELOAD_TMUX=false
+SETUP_AGENT=false
 
 # Colors for output
 RED='\033[0;31m'
@@ -61,12 +63,16 @@ Automatically reloads running applications (tmux, Ghostty) after setup.
 Options:
   --install-deps         Install dependencies via Homebrew (default: skip)
   --reload-tmux          Kill tmux server completely (default: just reload config)
+  --setup-agent          Link agents/AGENTS.md, merge agents/claude/settings.json
+                         into ~/.claude/settings.json, install missing Claude
+                         plugins and the skills in agents/skills.txt (default: skip)
   --help                 Show this help message
 
 Examples:
   ./setup.sh                           # Default setup
   ./setup.sh --install-deps            # Setup and install Homebrew deps
   ./setup.sh --reload-tmux             # Setup and kill tmux server
+  ./setup.sh --setup-agent             # Setup and configure coding agents
 
 EOF
     exit 0
@@ -109,6 +115,10 @@ parse_args() {
                 ;;
             --reload-tmux)
                 RELOAD_TMUX=true
+                shift
+                ;;
+            --setup-agent)
+                SETUP_AGENT=true
                 shift
                 ;;
             --help|-h)
@@ -169,6 +179,170 @@ create_symlinks() {
 
     # pspg (pager theme used by pgcli)
     create_symlink "$SCRIPT_DIR/pgcli/pspg_theme_catppuccin" "$HOME/.pspg_theme_catppuccin"
+}
+
+# -----------------------------------------------------------------------------
+# Step 2b: Coding agents (optional)
+# -----------------------------------------------------------------------------
+
+# Merge the repo settings into the live settings file. Claude Code writes to
+# this file at runtime, so it is merged instead of symlinked. Keys in the repo
+# file win; keys only in the live file (secrets, permissions) are kept.
+merge_claude_settings() {
+    local source="$SCRIPT_DIR/agents/claude/settings.json"
+    local target="$HOME/.claude/settings.json"
+
+    command -v jq &>/dev/null || error "jq is required for --setup-agent (brew install jq)"
+    jq empty "$source" 2>/dev/null || error "Invalid JSON in $source"
+
+    if [[ -L "$target" ]]; then
+        error "$target is a symlink. Remove it and run again."
+    fi
+
+    mkdir -p "$(dirname "$target")"
+
+    if [[ ! -f "$target" ]]; then
+        cp "$source" "$target"
+        success "Created $target from $source"
+        return
+    fi
+
+    jq empty "$target" 2>/dev/null || error "Invalid JSON in $target. Fix it and run again."
+
+    local tmp
+    tmp="$(mktemp "${target}.XXXXXX")"
+    if ! jq -s '.[0] * .[1]' "$target" "$source" > "$tmp"; then
+        rm -f "$tmp"
+        error "Failed to merge $source into $target"
+    fi
+
+    if jq -e --slurpfile a "$target" '. == $a[0]' "$tmp" &>/dev/null; then
+        rm -f "$tmp"
+        success "$target is up to date"
+        return
+    fi
+
+    local backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
+    cp -p "$target" "$backup"
+    mv "$tmp" "$target"
+    success "Merged $source into $target (backup: $backup)"
+}
+
+# Add missing marketplaces and install missing plugins listed in the repo
+# settings (extraKnownMarketplaces, enabledPlugins).
+install_claude_plugins() {
+    local source="$SCRIPT_DIR/agents/claude/settings.json"
+
+    if ! command -v claude &>/dev/null; then
+        warn "claude CLI not found, skipping plugin install"
+        return
+    fi
+
+    local known name repo
+    known="$(claude plugin marketplace list --json | jq -r '.[].name')"
+    while IFS=$'\t' read -r name repo; do
+        if grep -qx "$name" <<< "$known"; then
+            success "Marketplace $name is present"
+        else
+            info "Adding marketplace $name ($repo)..."
+            claude plugin marketplace add "$repo" || warn "Failed to add marketplace $name"
+        fi
+    done < <(jq -r '.extraKnownMarketplaces // {} | to_entries[] | "\(.key)\t\(.value.source.repo)"' "$source")
+
+    local installed plugin
+    installed="$(claude plugin list --json | jq -r '.[].id')"
+    while read -r plugin; do
+        if grep -qx "$plugin" <<< "$installed"; then
+            success "Plugin $plugin is installed"
+        else
+            info "Installing plugin $plugin..."
+            claude plugin install "$plugin" --scope user || warn "Failed to install plugin $plugin"
+        fi
+    done < <(jq -r '.enabledPlugins // {} | to_entries[] | select(.value) | .key' "$source")
+}
+
+skill_installed() {
+    [[ -f "$HOME/.claude/skills/$1/SKILL.md" ]]
+}
+
+# Install the skills in agents/skills.txt that are missing, grouped by source.
+install_agent_skills() {
+    local manifest="$SCRIPT_DIR/agents/skills.txt"
+    local claude_seo_tag="v2.4.1"
+
+    if ! command -v npx &>/dev/null; then
+        warn "npx not found, skipping skill install"
+        return
+    fi
+
+    local src
+    for src in $(awk '!/^[[:space:]]*(#|$)/ {print $1}' "$manifest" | sort -u); do
+        local missing=() skill
+        for skill in $(awk -v s="$src" '$1 == s {print $2}' "$manifest"); do
+            skill_installed "$skill" || missing+=("$skill")
+        done
+
+        if [[ ${#missing[@]} -eq 0 ]]; then
+            success "Skills from $src are installed"
+            continue
+        fi
+
+        info "Installing ${missing[*]} from $src..."
+        npx -y skills add "$src" --global --agent claude-code codex --skill "${missing[@]}" --yes \
+            || warn "Failed to install skills from $src"
+    done
+
+    # Motion AI Kit: skills, motion-reviewer agent and MCP servers. Interactive.
+    if skill_installed motion; then
+        success "Motion skill is installed"
+    else
+        info "Installing Motion AI Kit..."
+        npx -y motion-ai || warn "Failed to install Motion AI Kit"
+    fi
+
+    # Claude SEO: seo skills and seo-* agents, pinned to a release tag.
+    # It needs Python 3.10+, and macOS puts its own 3.9 first on PATH.
+    # The installer copies files before it builds the venv, so check the venv.
+    if skill_installed seo && [[ -x "$HOME/.claude/skills/seo/.venv/bin/python" ]]; then
+        success "Claude SEO is installed"
+        return
+    fi
+
+    local python="${CLAUDE_SEO_PYTHON:-}" candidate
+    if [[ -z "$python" ]]; then
+        for candidate in $(which -a python3 2>/dev/null); do
+            if "$candidate" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null; then
+                python="$candidate"
+                break
+            fi
+        done
+    fi
+
+    if [[ -z "$python" ]]; then
+        warn "Claude SEO needs Python 3.10+ (brew install python), skipping"
+        return
+    fi
+
+    info "Installing Claude SEO $claude_seo_tag with $python..."
+    curl -fsSL "https://raw.githubusercontent.com/AgriciDaniel/claude-seo/$claude_seo_tag/install.sh" \
+        | CLAUDE_SEO_TAG="$claude_seo_tag" CLAUDE_SEO_PYTHON="$python" bash \
+        || warn "Failed to install Claude SEO"
+}
+
+setup_agents() {
+    if [[ "$SETUP_AGENT" != true ]]; then
+        info "Skipping agent setup (use --setup-agent to enable)"
+        return
+    fi
+
+    info "Setting up coding agents..."
+
+    create_symlink "$SCRIPT_DIR/agents/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+    create_symlink "$SCRIPT_DIR/agents/AGENTS.md" "$HOME/.codex/AGENTS.md"
+
+    merge_claude_settings
+    install_claude_plugins
+    install_agent_skills
 }
 
 # -----------------------------------------------------------------------------
@@ -272,6 +446,8 @@ main() {
     install_dependencies
     echo ""
     create_symlinks
+    echo ""
+    setup_agents
     echo ""
     reload_tmux
     echo ""

@@ -20,6 +20,12 @@
 - Never mention Claude, AI, or the model in commit messages or PRs. Do not add "Co-Authored-By: Claude" or "Generated with Claude Code" lines.
 - Write PR titles and descriptions in Simplified Technical English (ASD-STE100): short sentences, active voice, one instruction per sentence, simple approved words.
 
+## Tmux and other agents
+- One tmux session per project. The `ssnxd` session is for general work: housekeeping, terminals and browsers. Many Claude sessions can run on this machine at the same time.
+- Find your place first: `tmux display-message -p -t "$TMUX_PANE" '#S:#I.#P'`. Message another Claude session only when told to, and only the one you were told to message.
+- Use `ListAgents`, then `SendMessage` (`notify_when_idle` to wait). Never type into a pane with `tmux send-keys`, because the Enter gets lost. Read panes only, with `tmux capture-pane`.
+- Stop the servers and browsers you start before you report. Never stop another session's.
+
 ## Working style
 - Do not patch speculatively. Find the cause with evidence first, and research the problem domain before changing code.
 - Give the estimated cost before starting an expensive run, such as heavy API use or a large agent fan-out.

@@ -1,6 +1,5 @@
 # Skills installed by ./setup.sh --setup-agent with `npx skills add`.
 # Format: <source> <skill>. One skill per line.
-# Motion (motion-ai) and SEO (claude-seo) use their own installers. See setup.sh.
 
 github/gh-stack                               gh-stack
 vercel-labs/skills                            find-skills

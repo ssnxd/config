@@ -11,7 +11,7 @@
 
 ## Deploys
 - A merge is not the end. Monitor the deploy logs until the deploy is live, then run the same end-to-end test against the deployed environment.
-- Fix the immediate cause now. Open a GitHub issue for each deferred follow-up.
+- Fix the immediate cause now. For each deferred follow-up, ask before you open a GitHub issue. Do not open issues automatically.
 
 ## Git and PRs
 - Always use a git worktree when starting a new feature.

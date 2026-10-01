@@ -81,15 +81,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "osascript -e 'display notification \"Claude finished and is waiting\" with title \"Claude Code\"' 2>/dev/null || true",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
             "command": "$HOME/.local/bin/agentbar event",
             "timeout": 5
           }
@@ -150,7 +141,6 @@
     "context7@claude-plugins-official": true,
     "figma@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "paper-desktop@paper": true,
     "playwright@claude-plugins-official": true,
     "prisma@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
@@ -160,12 +150,6 @@
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
-      }
-    },
-    "paper": {
-      "source": {
-        "source": "github",
-        "repo": "paper-design/agent-plugins"
       }
     }
   },

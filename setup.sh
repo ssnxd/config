@@ -268,7 +268,6 @@ skill_installed() {
 # Install the skills in agents/skills.txt that are missing, grouped by source.
 install_agent_skills() {
     local manifest="$SCRIPT_DIR/agents/skills.txt"
-    local claude_seo_tag="v2.4.1"
 
     if ! command -v npx &>/dev/null; then
         warn "npx not found, skipping skill install"
@@ -291,42 +290,6 @@ install_agent_skills() {
         npx -y skills add "$src" --global --agent claude-code codex --skill "${missing[@]}" --yes \
             || warn "Failed to install skills from $src"
     done
-
-    # Motion AI Kit: skills, motion-reviewer agent and MCP servers. Interactive.
-    if skill_installed motion; then
-        success "Motion skill is installed"
-    else
-        info "Installing Motion AI Kit..."
-        npx -y motion-ai || warn "Failed to install Motion AI Kit"
-    fi
-
-    # Claude SEO: seo skills and seo-* agents, pinned to a release tag.
-    # It needs Python 3.10+, and macOS puts its own 3.9 first on PATH.
-    # The installer copies files before it builds the venv, so check the venv.
-    if skill_installed seo && [[ -x "$HOME/.claude/skills/seo/.venv/bin/python" ]]; then
-        success "Claude SEO is installed"
-        return
-    fi
-
-    local python="${CLAUDE_SEO_PYTHON:-}" candidate
-    if [[ -z "$python" ]]; then
-        for candidate in $(which -a python3 2>/dev/null); do
-            if "$candidate" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null; then
-                python="$candidate"
-                break
-            fi
-        done
-    fi
-
-    if [[ -z "$python" ]]; then
-        warn "Claude SEO needs Python 3.10+ (brew install python), skipping"
-        return
-    fi
-
-    info "Installing Claude SEO $claude_seo_tag with $python..."
-    curl -fsSL "https://raw.githubusercontent.com/AgriciDaniel/claude-seo/$claude_seo_tag/install.sh" \
-        | CLAUDE_SEO_TAG="$claude_seo_tag" CLAUDE_SEO_PYTHON="$python" bash \
-        || warn "Failed to install Claude SEO"
 }
 
 setup_agents() {

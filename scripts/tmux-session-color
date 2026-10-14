@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 
 # Give every tmux session its own accent colour, so a session is recognisable
-# without reading. Sets two session options that tmux.conf uses in its styles:
-#   @accent      the colour itself (status blocks, active pane border)
-#   @accent_bg   a light tint of the colour, for the active pane background
+# without reading. Sets the session option @accent, which tmux.conf uses for
+# the status blocks and the active pane border.
 
 set -euo pipefail
 
 MAP_FILE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tmux/session-colors"
-BASE='1e1e2e'
 PALETTE=(mauve green peach blue red teal yellow pink)
-BG_PERCENT=9
 
 name_to_hex() {
 	case "$1" in
@@ -51,20 +48,6 @@ hashed_colour() {
 	printf '%s' "${PALETTE[$((hash % ${#PALETTE[@]}))]}"
 }
 
-# Blend a colour into the base: blend <hex> <percent>
-blend() {
-	local hex="$1"
-	local percent="$2"
-	local offset base_part hex_part result=''
-
-	for offset in 0 2 4; do
-		base_part=$((16#${BASE:offset:2}))
-		hex_part=$((16#${hex:offset:2}))
-		result+="$(printf '%02x' $((base_part + (hex_part - base_part) * percent / 100)))"
-	done
-	printf '%s' "$result"
-}
-
 colour_session() {
 	local session_name="$1"
 	local colour hex
@@ -73,7 +56,6 @@ colour_session() {
 	hex="$(name_to_hex "$colour" || name_to_hex "$(hashed_colour "$session_name")")"
 
 	tmux set-option -t "=$session_name:" @accent "#$hex"
-	tmux set-option -t "=$session_name:" @accent_bg "#$(blend "$hex" "$BG_PERCENT")"
 }
 
 tmux list-sessions -F '#{session_name}' | while IFS= read -r session_name; do

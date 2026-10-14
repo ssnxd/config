@@ -14,12 +14,11 @@ vim.o.timeoutlen = 300 -- Time to wait for mapped sequence
 ---------------------------------------------------------------------------
 -- UI/UX
 ---------------------------------------------------------------------------
-vim.o.termguicolors = true -- Enable 24-bit RGB color
 vim.o.cursorline = true -- Highlight current line
 vim.o.number = true -- Show line numbers
 vim.o.relativenumber = true -- Show relative line numbers
 vim.o.signcolumn = "yes" -- Always show sign column
-vim.o.showmode = false -- Don't show mode (lualine shows it)
+vim.o.showmode = false -- Don't show mode (the statusline shows it)
 vim.o.showtabline = 2 -- Always show tabline
 vim.o.laststatus = 3 -- Global statusline across splits
 vim.o.cmdheight = 1 -- Command line height
@@ -53,8 +52,6 @@ vim.o.wrap = true -- Enable line wrapping
 -- Completion
 ---------------------------------------------------------------------------
 vim.o.completeopt = "menu,menuone,noselect" -- Completion options
-vim.o.pumblend = 10 -- Popup menu transparency
-vim.o.winblend = 10 -- Window transparency
 
 ---------------------------------------------------------------------------
 -- Session
@@ -69,11 +66,6 @@ vim.opt.sessionoptions = {
 	"skiprtp",
 	"folds",
 }
-
----------------------------------------------------------------------------
--- Features
----------------------------------------------------------------------------
-vim.g.have_nerd_font = true -- Enable nerd font icons
 
 ---------------------------------------------------------------------------
 -- Disable unused providers (performance)

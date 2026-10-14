@@ -52,8 +52,3 @@ set("n", "<A-j>", ":m .+1<CR>==", { desc = "Move line down" })
 set("n", "<A-k>", ":m .-2<CR>==", { desc = "Move line up" })
 set("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move lines down" })
 set("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move lines up" })
-
----------------------------------------------------------------------------
--- Utility
----------------------------------------------------------------------------
-set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })

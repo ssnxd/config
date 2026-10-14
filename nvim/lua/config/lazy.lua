@@ -36,6 +36,9 @@ require("lazy").setup("plugins", {
 			},
 		},
 	},
+	rocks = {
+		enabled = false, -- no plugin needs luarocks
+	},
 	ui = {
 		border = "single",
 	},

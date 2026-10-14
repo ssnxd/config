@@ -33,7 +33,6 @@ return {
 	{
 		"windwp/nvim-ts-autotag",
 		event = "BufReadPre",
-		config = true,
 		opts = {},
 	},
 
@@ -42,7 +41,7 @@ return {
 	---------------------------------------------------------------------------
 	{
 		"ibhagwan/fzf-lua",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
+		dependencies = { "echasnovski/mini.icons" },
 		config = function()
 			require("fzf-lua").setup({
 				"telescope", -- Use telescope-like defaults
@@ -70,29 +69,7 @@ return {
 						},
 					},
 				},
-				hls = {
-					border = "FzfLuaBorder",
-					cursorline = "FzfLuaCursorLine",
-					preview_border = "FzfLuaPreviewBorder",
-					preview_title = "FzfLuaPreviewTitle",
-					title = "FzfLuaTitle",
-				},
-				fzf_colors = {
-					["border"] = { "fg", "FzfLuaBorder" },
-					["bg+"] = { "bg", "FzfLuaCursorLine" },
-					["fg+"] = { "fg", "FzfLuaCursorLine" },
-					["gutter"] = { "bg", "FzfLuaFzfGutter" },
-					["header"] = { "fg", "FzfLuaHeaderText" },
-					["hl"] = { "fg", "FzfLuaFzfMatch" },
-					["hl+"] = { "fg", "FzfLuaFzfMatch" },
-					["info"] = { "fg", "Comment" },
-					["marker"] = { "fg", "FzfLuaFzfMarker" },
-					["pointer"] = { "fg", "FzfLuaFzfPointer" },
-					["prompt"] = { "fg", "FzfLuaFzfPrompt" },
-					["query"] = { "fg", "FzfLuaNormal" },
-					["separator"] = { "fg", "FzfLuaFzfSeparator" },
-					["spinner"] = { "fg", "FzfLuaFzfPrompt" },
-				},
+				fzf_colors = true, -- take fzf colours from the colorscheme
 				keymap = {
 					builtin = {
 						["<F1>"] = "toggle-help",
@@ -141,9 +118,6 @@ return {
 			vim.keymap.set("n", "<leader>fr", function()
 				require("fzf-lua").resume()
 			end, { desc = "Resume last search" })
-			vim.keymap.set("n", "<leader>o", function()
-				require("fzf-lua").resume()
-			end, { desc = "Resume last search" })
 		end,
 	},
 
@@ -176,15 +150,14 @@ return {
 				"html",
 				"markdown",
 				"markdown_inline",
+				"regex", -- noice cmdline highlighting
+				"bash", -- noice cmdline highlighting
 			})
 
 			-- Enable treesitter highlighting for all supported filetypes
 			vim.api.nvim_create_autocmd("FileType", {
 				callback = function(args)
-					-- Only enable if a parser is available for this filetype
-					if pcall(vim.treesitter.start, args.buf) then
-						-- Treesitter highlighting enabled
-					end
+					pcall(vim.treesitter.start, args.buf) -- fails quietly when no parser exists
 				end,
 			})
 		end,
@@ -296,15 +269,15 @@ return {
 	---------------------------------------------------------------------------
 	{
 		"stevearc/oil.nvim",
-		dependencies = { { "echasnovski/mini.icons", opts = {} } },
+		dependencies = { "echasnovski/mini.icons" },
 		lazy = false,
 		config = function()
 			require("oil").setup({
 				columns = {
 					"icon",
-					{ "permissions", highlight = "OilPermissionRead" },
-					{ "size", highlight = "OilSize" },
-					{ "mtime", highlight = "OilMtime" },
+					"permissions",
+					"size",
+					"mtime",
 				},
 				win_options = {
 					cursorline = true,
@@ -341,14 +314,6 @@ return {
 					is_always_hidden = function(name, _)
 						return name == ".." or name == ".git"
 					end,
-					highlight_filename = function(_, is_hidden, _, is_link_orphan)
-						if is_link_orphan then
-							return "OilOrphanLink"
-						end
-						if is_hidden then
-							return "OilHidden"
-						end
-					end,
 				},
 				preview_win = {
 					update_on_cursor_moved = true,
@@ -363,11 +328,9 @@ return {
 						return " Files "
 					end,
 					preview_split = "right",
-					win_options = {
-						winblend = 0,
-						winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,FloatTitle:FloatTitle,CursorLine:FzfLuaCursorLine",
-					},
 					override = function(conf)
+						-- nvim rejects title_pos without a title, and oil opens the float untitled
+						conf.title = " Files "
 						conf.title_pos = "center"
 						return conf
 					end,
@@ -399,51 +362,6 @@ return {
 	},
 
 	---------------------------------------------------------------------------
-	-- LSP progress notifications
-	---------------------------------------------------------------------------
-	{
-		"j-hui/fidget.nvim",
-		opts = {
-			progress = {
-				display = {
-					render_limit = 8,
-					done_icon = "✓",
-					done_style = "FidgetDone",
-					progress_icon = { "dots" },
-					progress_style = "FidgetTask",
-					group_style = "FidgetGroup",
-					icon_style = "FidgetIcon",
-					format_group_name = function(group)
-						return tostring(group)
-					end,
-				},
-			},
-			notification = {
-				override_vim_notify = false,
-				view = {
-					stack_upwards = true,
-					align = "message",
-					group_separator = " ",
-					group_separator_hl = "FidgetMuted",
-					line_margin = 1,
-				},
-				window = {
-					normal_hl = "FidgetNormal",
-					winblend = 0,
-					border = "single",
-					zindex = 45,
-					max_width = 0.34,
-					max_height = 0,
-					x_padding = 2,
-					y_padding = 1,
-					align = "bottom",
-					relative = "editor",
-				},
-			},
-		},
-	},
-
-	---------------------------------------------------------------------------
 	-- Better UI for messages, cmdline and popups
 	---------------------------------------------------------------------------
 	{
@@ -455,8 +373,6 @@ return {
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
-					-- Disabled: this is for nvim-cmp, not blink.cmp
-					["cmp.entry.get_documentation"] = false,
 				},
 			},
 			views = {
@@ -494,7 +410,6 @@ return {
 				bottom_search = true, -- Classic bottom cmdline for search
 				command_palette = true, -- Position cmdline and popupmenu together
 				long_message_to_split = true, -- Long messages sent to split
-				inc_rename = true, -- Input dialog for inc-rename.nvim
 				lsp_doc_border = true, -- Border for hover docs and signature help
 			},
 		},

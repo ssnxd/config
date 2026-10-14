@@ -45,14 +45,15 @@ return {
 			require("mason-lspconfig").setup({
 				ensure_installed = {
 					"lua_ls", -- Lua
-					"elixirls", -- Elixir
 					"ts_ls", -- TypeScript/JavaScript
 					"jsonls", -- JSON
 					"cssls", -- CSS
 					"gopls", -- Go
 					"html", -- HTML
 				},
-				-- automatic_enable is true by default (replaces removed automatic_installation)
+				-- Enable only the servers listed in vim.lsp.enable below. Otherwise every
+				-- installed Mason package with an LSP config starts (biome, oxfmt, stylua).
+				automatic_enable = false,
 			})
 		end,
 	},
@@ -278,7 +279,6 @@ return {
 					-------------------------------------------------------------------
 					-- Core LSP functionality
 					-------------------------------------------------------------------
-					map("n", "K", vim.lsp.buf.hover, "Hover Documentation")
 					map("n", "<F2>", vim.lsp.buf.rename, "Rename Symbol")
 					map({ "n", "v" }, "<leader>ca", fzf.lsp_code_actions, "Code Actions")
 
@@ -288,12 +288,6 @@ return {
 					map("n", "<leader>l", vim.diagnostic.open_float, "Show Line Diagnostics")
 					map("n", "<leader>ld", fzf.diagnostics_document, "Document Diagnostics")
 					map("n", "<leader>lw", fzf.diagnostics_workspace, "Workspace Diagnostics")
-					map("n", "[d", function()
-						vim.diagnostic.jump({ count = 1, float = true })
-					end, "Previous Diagnostic")
-					map("n", "]d", function()
-						vim.diagnostic.jump({ count = -1, float = true })
-					end, "Next Diagnostic")
 
 					-------------------------------------------------------------------
 					-- Symbol navigation
@@ -314,9 +308,9 @@ return {
 					map("n", "<leader>co", fzf.lsp_outgoing_calls, "Outgoing Calls")
 
 					-------------------------------------------------------------------
-					-- Signature help (using Ctrl+s to avoid window nav conflict)
+					-- Signature help (insert-mode <C-s> is built in)
 					-------------------------------------------------------------------
-					map({ "n", "i" }, "<C-s>", vim.lsp.buf.signature_help, "Signature Help")
+					map("n", "<C-s>", vim.lsp.buf.signature_help, "Signature Help")
 					map("n", "<leader>ls", vim.lsp.buf.signature_help, "Code Signatures")
 
 					-------------------------------------------------------------------

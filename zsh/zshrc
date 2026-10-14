@@ -41,6 +41,9 @@ alias lt='eza --tree --level=2'
 alias tree='eza --tree'
 alias cc='claude --dangerously-skip-permissions'
 
+# Claude Code drops to 256 colours inside tmux unless told the terminal has truecolor.
+[[ -n $TMUX && -n $GHOSTTY_RESOURCES_DIR ]] && export CLAUDE_CODE_TMUX_TRUECOLOR=1
+
 # --- Prompt ---
 autoload -U promptinit; promptinit
 prompt pure

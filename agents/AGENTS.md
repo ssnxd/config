@@ -23,7 +23,7 @@
 ## Tmux and other agents
 - One tmux session per project. The `ssnxd` session is for general work: housekeeping, terminals and browsers. Many Claude sessions can run on this machine at the same time.
 - Find your place first: `tmux display-message -p -t "$TMUX_PANE" '#S:#I.#P'`. Message another Claude session only when told to, and only the one you were told to message.
-- Use `ListAgents`, then `SendMessage` (`notify_when_idle` to wait). Never type into a pane with `tmux send-keys`, because the Enter gets lost. Read panes only, with `tmux capture-pane`.
+- Use `ListAgents`, then `SendMessage` (`notify_when_idle` to wait). Never type into a pane with `tmux send-keys`, because the Enter gets lost. Read panes only, with `tmux capture-pane -p -J -S -200` (`-J` joins wrapped lines).
 - Stop the servers and browsers you start before you report. Never stop another session's.
 
 ## Working style

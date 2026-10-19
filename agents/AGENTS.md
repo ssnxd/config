@@ -45,3 +45,6 @@
 - Small tables (up to ~4 columns and ~10 rows): send a space-aligned monospace table inside a triple-backtick code block.
 - Larger tables: create a Slack canvas (canvases render real markdown tables) and send a message with the headline, the key fact, and the canvas link.
 - Just 2-3 values: write them inline in the sentence, no table.
+
+## Compact instructions
+When compacting, keep: the current task and what done means for it; PR, issue and branch names with their state (open, merged, deployed, verified); worktree paths; each command run with its verified result, one key output line; environment state that must still be undone (servers, browser tabs, test data, clones); open items and decisions owed to the user; artifact, canvas and document IDs. Drop exploration dead ends, raw logs and tool output.

@@ -171,6 +171,9 @@ create_symlinks() {
     # Tmux
     create_symlink "$SCRIPT_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
+    # Rex (init.lua and themes/)
+    create_symlink "$SCRIPT_DIR/rex" "$HOME/.config/rex"
+
     # Zsh
     create_symlink "$SCRIPT_DIR/zsh/zshrc" "$HOME/.zshrc"
 

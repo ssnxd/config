@@ -1,6 +1,6 @@
 # ssnxd's configs
 
-Dotfiles with configuration for Neovim, Ghostty, and Tmux.
+Dotfiles with configuration for Neovim, Ghostty, Tmux, and Rex.
 
 Theme: [catppuccin mocha](https://catppuccin.com/)
 

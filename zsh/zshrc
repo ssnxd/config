@@ -31,6 +31,15 @@ if [[ ! -f "$HOME/.zcompdump.zwc" || "$HOME/.zcompdump" -nt "$HOME/.zcompdump.zw
   zcompile "$HOME/.zcompdump"
 fi
 [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
+# Rex: cache its completion script; regenerate when the rex binary changes
+if (( $+commands[rex] )); then
+  _rex_comp="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/_rex"
+  if [[ ! -s $_rex_comp || $commands[rex] -nt $_rex_comp ]]; then
+    mkdir -p "${_rex_comp:h}" && rex completion zsh >| "$_rex_comp"
+  fi
+  source "$_rex_comp"
+  unset _rex_comp
+fi
 
 # --- Aliases ---
 alias ls='eza'

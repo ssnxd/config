@@ -28,6 +28,11 @@
 - Read panes only. Rex: `rex capture -b <block> --unwrap --trim`. Tmux: `tmux capture-pane -p -J -S -200` (`-J` joins wrapped lines).
 - Stop the servers, browsers, panes and tabs you start before you report. Never stop another session's.
 
+## Workspace
+- Client work, tasks and the Obsidian setup are described in `~/clients/CLAUDE.md`.
+- Personal projects live in `~/code/ssnxd/`. Dotfiles live in `~/config`.
+- Skills and plugins stay at user scope. Never scope them per project.
+
 ## Working style
 - Do not patch speculatively. Find the cause with evidence first, and research the problem domain before changing code.
 - Give the estimated cost before starting an expensive run, such as heavy API use or a large agent fan-out.
